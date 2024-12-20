@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Invisiguard is a security solutions company that provides a comprehensive suite of security services to help businesses protect their digital assets.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
