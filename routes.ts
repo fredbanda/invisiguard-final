@@ -36,4 +36,4 @@ export const apiAuthPrefix = "/api/auth"
  * @type {string}
  */
 
-export const DEFAULT_REDIRECT_ROUTE = "/dashboard"
+export const DEFAULT_LOGIN_REDIRECT = "/dashboard"
