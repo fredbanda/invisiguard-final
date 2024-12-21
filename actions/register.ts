@@ -7,6 +7,8 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { getUserByEmail } from "@/data/user";
 import { Prisma } from "@prisma/client";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
@@ -35,9 +37,11 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
       },
     });
 
-    // TODO: Send verification email
+    // Send verification email
+    const verificationToken = await generateVerificationToken(email);
+    await sendVerificationEmail(verificationToken.email, verificationToken.token);
 
-    return { success: "User registered successfully!" };
+    return { success: "confirmation email sent"};
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {

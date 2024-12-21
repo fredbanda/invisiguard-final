@@ -25,6 +25,34 @@ export const {
     }
   },
   callbacks: {
+    async signIn({ user, account }: { user: any; account: any }) {
+      try {
+        // Allow OAuth accounts without email verification
+        if (account?.provider !== "credentials") return true;
+    
+        // Check if the user object has an ID
+        if (!user?.id) {
+          console.error("User ID is missing");
+          return false;
+        }
+    
+        // Fetch the user by ID
+        const existingUser = await getUserById(user.id);
+    
+        //Preventing users from logging in before validating their emails
+        if (!existingUser?.emailVerified) {
+          console.error("User does not exist in our records");
+          return false;
+        }
+
+        //TODO: Add 2FA CHECKS
+    
+        return true;
+      } catch (error) {
+        console.error("Error during signIn:", error);
+        return false;
+      }
+    },
     async session({ session, token }) {
       console.log({sessionToken: token});
       if(token.sub && session.user){
