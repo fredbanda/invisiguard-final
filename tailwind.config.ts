@@ -9,6 +9,15 @@ export default {
   ],
   theme: {
   	extend: {
+		keyframes: {
+			zoom: {
+			  '0%, 100%': { transform: 'scale(1)' },
+			  '50%': { transform: 'scale(1.2)' },
+			},
+		  },
+		  animation: {
+			zoom: 'zoom 1.5s infinite',
+		  },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -58,5 +67,6 @@ export default {
   		}
   	}
   },
+  
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
