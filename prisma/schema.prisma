@@ -35,7 +35,7 @@ model User {
   role                                    UserRole @default(USER)
   country                                 String?
   postcode                                String?
-  isTwoFactorAuthenticated                Boolean         @default(false)
+  isTwoFactorEnabled                      Boolean         @default(false)
   twoFactorConfirmation                   TwoFactorConfirmation? 
 
   createdAt                               DateTime @default(now())

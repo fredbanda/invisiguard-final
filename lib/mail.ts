@@ -57,7 +57,7 @@ export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
   await transporter.sendMail({
     from: 'invisiguard@eunny.co.za',
     to: email,
-    subject: 'Invisiguard - Two-factor authentication',
+    subject: 'Invisiguard - Two-factor authentication CODE',
     html: `<p>Hello there,</p>
            <p>Please verify your two-factor authentication by entering the following code:</p>
            <h2>${token}</h2>

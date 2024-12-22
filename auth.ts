@@ -5,6 +5,7 @@ import { UserRole } from "@prisma/client";
 import { db } from "@/lib/db";
 import authConfig from "@/auth.config";
 import { getUserById } from "@/data/user";
+import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 
 export const {
   handlers: { GET, POST },
@@ -45,8 +46,22 @@ export const {
           return false;
         }
 
-        //TODO: Add 2FA CHECKS
-    
+        //2FA CHECKS
+        if(existingUser.isTwoFactorEnabled){
+          const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(user.id);
+
+          if(!twoFactorConfirmation) return false;
+
+          // delete the confirmation after successful login
+          await db.twoFactorConfirmation.delete({
+            where: {
+              id: twoFactorConfirmation.id,
+            },
+          });
+
+          
+        }
+
         return true;
       } catch (error) {
         console.error("Error during signIn:", error);
