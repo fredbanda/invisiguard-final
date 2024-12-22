@@ -35,6 +35,8 @@ model User {
   role                                    UserRole @default(USER)
   country                                 String?
   postcode                                String?
+  isTwoFactorAuthenticated                Boolean         @default(false)
+  twoFactorConfirmation                   TwoFactorConfirmation? 
 
   createdAt                               DateTime @default(now())
   updatedAt                               DateTime @updatedAt
@@ -91,4 +93,27 @@ model PasswordResetToken {
   @@unique([email, token])
 
   @@map("password_reset_token")
+}
+
+model TwoFactorToken {
+  id                                       String          @id @default(cuid())
+  email                                    String          @unique
+  token                                    String          @unique
+  expires                                  DateTime
+
+  createdAt                                DateTime @default(now())
+  updatedAt                                DateTime @updatedAt
+
+  @@unique([email, token])
+
+  @@map("two_factor_token")
+}
+
+model TwoFactorConfirmation {
+  id                                       String          @id @default(cuid())
+  userId                                   String
+  user                                     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId])
+
+  @@map("two_factor_confirmation")
 }
