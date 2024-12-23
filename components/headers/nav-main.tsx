@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -9,6 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react"; // Import useSession hook
 import {MoonLoader} from "react-spinners";
+import { logout } from "@/actions/logout";
 
 const NavbarMain = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,6 +37,10 @@ const NavbarMain = () => {
 
   if (status === "loading") {
   
+  }
+
+  const onClick = () => {
+    logout();
   }
 
   return (
@@ -133,9 +136,9 @@ const NavbarMain = () => {
                   </li>
                 ))}
               </ul>
-              <Link href="/auth/logout">
-                <Button className="w-full mt-4">Logout</Button>
-              </Link>
+
+                <Button onClick={onClick} className="w-full mt-4 hover:bg-red-600">Logout</Button>
+
             </div>
           )}
         </div>
