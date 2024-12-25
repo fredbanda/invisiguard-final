@@ -15,7 +15,7 @@ import { LogoutButton } from "./logout-button";
 export const UserButton = () => {
   const user = useCurrentUser();
   return (
-    <DropdownMenu>
+    <DropdownMenu >
       <DropdownMenuTrigger>
         <Avatar>
           <AvatarImage src={user?.image || ""} alt="Avatar" />

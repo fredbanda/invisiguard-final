@@ -5,10 +5,12 @@ const ServerComponent = async () => {
     const user = await currentUser();
   return (
 
+    <div className="mb-10">
         <UserInfo
          user={user}
          label="💻 Server component"
          />
+         </div>
   )
 }
 

@@ -19,7 +19,6 @@ import { Button } from "../ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { useState, useTransition } from "react";
-import { resetPassword } from "@/actions/reset-password";
 import { useSearchParams } from "next/navigation";
 import { newPassword } from "@/actions/new-password";
 

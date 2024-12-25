@@ -8,13 +8,13 @@ import { usePathname } from "next/navigation";
 export const DashboardNav = () => {
   const pathname = usePathname();
   return (
-    <nav className="bg-slate-200 flex justify-between items-center p-4 rounded-xl w-[640px] shadow-sm">
+    <nav className="bg-slate-200 flex justify-between items-center p-4 rounded-xl w-[640px] shadow-sm mt-12">
       <div className="flex gap-x-2">
         <Button
           asChild
           variant={pathname === "/dashboard/settings" ? "default" : "outline"}
         >
-          <Link href="/dashboard/settings">Settings</Link>
+          <Link href="/dashboard/settings">Profile Info</Link>
         </Button>
         <Button
           asChild
@@ -33,6 +33,12 @@ export const DashboardNav = () => {
           variant={pathname === "/dashboard/admin" ? "default" : "outline"}
         >
           <Link href="/dashboard/admin">Admin</Link>
+        </Button>
+        <Button
+          asChild
+          variant={pathname === "/dashboard/profile" ? "default" : "outline"}
+        >
+          <Link href="/dashboard/profile">Profile Settings</Link>
         </Button>
       </div>
       <UserButton />

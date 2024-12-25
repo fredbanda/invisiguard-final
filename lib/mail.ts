@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 
+const domain = process.env.NEXT_PUBLIC_VERCEL_URL;
+
 const transporter = nodemailer.createTransport({
   host: 'mail.eunny.co.za', 
   port: 465, 
@@ -11,8 +13,8 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetLink = `http://localhost:3000/auth/new-password?token=${token}`;
- 
+  const resetLink = `/auth/new-password?token=${token}`;
+  
 
   const mailOptions = {
     from: "invisiguards@eunny.co.za", // sender address
@@ -33,7 +35,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
 };
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-  const confirmEmailLink = `http://localhost:3000/auth/new-verification?token=${token}`;
+  const confirmEmailLink = `${domain}/auth/new-verification?token=${token}`;
 
   const mailOptions = {
     from: "invisiguard@eunny.co.za", // sender address

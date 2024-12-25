@@ -21,9 +21,11 @@ import { FormSuccess } from "@/components/form-success";
 import { login } from "@/actions/login";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Sorry this Email is registered and linked to another account."
@@ -69,7 +71,7 @@ export const LoginForm = () => {
     const twoFactorCode = code.join(""); 
   
     startTransition(() => {
-      login({ ...values, twoFactorCode }) // Include twoFactorCode in the login payload
+      login({ ...values, twoFactorCode}, callbackUrl) // Include twoFactorCode in the login payload
         .then((data) => {
           if (data?.error) {
             form.reset();
@@ -77,16 +79,21 @@ export const LoginForm = () => {
           }
   
           if (data?.success) {
+            toast.success("You have successfully logged in", {
+              position: "top-right",
+            });
             form.reset();
             setSuccess(data.success);
           }
+      
           if (data?.twoFactor) {
+            setSuccess("Please check your email for verification code");
+            toast.success("Please check your email for verification code", {
+              position: "top-right",
+            });
             setShowTwoFactor(true);
           }
         })
-        .catch(() => {
-          setError("Something went wrong. Please try again later.");
-        });
     });
   };
     

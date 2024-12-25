@@ -1,4 +1,4 @@
-import { ResetPasswordForm } from "@/components/auth/reset-password-form.tsx"
+import { ResetPasswordForm } from "@/components/auth/reset-password-form"
 
 const ResetPassword = () => {
   return (
