@@ -1,6 +1,5 @@
 "use client";
 
-import { UserButton } from "@/components/auth/user-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,27 +11,27 @@ export const DashboardNav = () => {
       <div className="flex gap-x-2">
         <Button
           asChild
-          variant={pathname === "/dashboard/settings" ? "default" : "outline"}
+          variant={pathname === "/dashboard/reports" ? "default" : "outline"}
         >
-          <Link href="/dashboard/settings">Profile Info</Link>
+          <Link href="/dashboard/reports">Reports</Link>
         </Button>
         <Button
           asChild
-          variant={pathname === "/dashboard/server" ? "default" : "outline"}
+          variant={pathname === "/dashboard/pen-test" ? "default" : "outline"}
         >
-          <Link href="/dashboard/server">Server</Link>
+          <Link href="/dashboard/pen-test">Pen Test</Link>
         </Button>
         <Button
           asChild
-          variant={pathname === "/dashboard/client" ? "default" : "outline"}
+          variant={pathname === "/dashboard/scam-scan" ? "default" : "outline"}
         >
-          <Link href="/dashboard/client">Client</Link>
+          <Link href="/dashboard/scam-scan">Scam Scanner</Link>
         </Button>
         <Button
           asChild
-          variant={pathname === "/dashboard/admin" ? "default" : "outline"}
+          variant={pathname === "/dashboard/identity-check" ? "default" : "outline"}
         >
-          <Link href="/dashboard/admin">Admin</Link>
+          <Link href="/dashboard/identity-check">Identity Check</Link>
         </Button>
         <Button
           asChild
@@ -41,7 +40,6 @@ export const DashboardNav = () => {
           <Link href="/dashboard/profile">Profile Settings</Link>
         </Button>
       </div>
-      <UserButton />
     </nav>
   );
 };

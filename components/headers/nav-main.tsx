@@ -121,8 +121,8 @@ const NavbarMain = () => {
               </h6>
               <ul className="space-y-1.5">
                 {[
-                  { text: "Settings", href: "/dashboard/settings" },
-                  { text: "Profile", href: "/dashboard/profile" },
+                  { text: "Settings", href: "/dashboard/profile" },
+                  { text: "User Info", href: "/dashboard/server" },
                   { text: "Reports", href: "/dashboard/reports" },
                   { text: "Supports Tickets", href: "/dashboard/tickets" },
                 ].map((item, index) => (
