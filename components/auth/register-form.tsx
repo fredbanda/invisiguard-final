@@ -1,30 +1,23 @@
-// Reusable component for login form
 "use client";
 
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { useForm } from "react-hook-form";
 import { RegisterSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
-import { register} from "@/actions/register";
+import { register } from "@/actions/register";
 import { useState, useTransition } from "react";
+import * as z from "zod";
 
 export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [success, setSuccess] = useState<string | undefined>(undefined);
+
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -36,20 +29,25 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
-    console.log(values);
+    console.log("Register Form Values:", values);
+    
     setError("");
     setSuccess("");
 
     startTransition(() => {
       register(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        if (data.error) {
+          setError(data.error);
+        } else if (data.success) {
+          setSuccess(data.success);
+        }
       });
     });
   };
+
   return (
     <CardWrapper
-      headerLabel="Welcome back to Invisiguard"
+      headerLabel="Welcome to Invisiguard"
       backButtonLabel="Already have an account? Login here"
       backButtonHref="/auth/login"
       showSocialButtons
@@ -58,7 +56,7 @@ export const RegisterForm = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             <div className="flex space-x-4">
-              <div className="flex-1 space-y-4">
+              <div className="flex-1">
                 <FormField
                   control={form.control}
                   name="name"
@@ -68,17 +66,16 @@ export const RegisterForm = () => {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="e.g. Shaka Zulu"
-                          type="name"
+                          placeholder="e.g., Shaka Zulu"
                           disabled={isPending}
                         />
                       </FormControl>
-                      <FormMessage className="text-[1rem] text-center" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <div className="flex-1 space-y-4">
+              <div className="flex-1">
                 <FormField
                   control={form.control}
                   name="phone"
@@ -88,12 +85,11 @@ export const RegisterForm = () => {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="e.g.07 855 4536"
-                          type="phone"
+                          placeholder="e.g., +1234567890"
                           disabled={isPending}
                         />
                       </FormControl>
-                      <FormMessage className="text-[1rem] text-center" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -108,12 +104,12 @@ export const RegisterForm = () => {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="e.g. shakazulu@eunny.co.za"
+                      placeholder="e.g., shakazulu@example.com"
                       type="email"
                       disabled={isPending}
                     />
                   </FormControl>
-                  <FormMessage className="text-[1rem] text-center" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -126,18 +122,18 @@ export const RegisterForm = () => {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="e.g.******"
+                      placeholder="e.g., ******"
                       type="password"
                       disabled={isPending}
                     />
                   </FormControl>
-                  <FormMessage className="text-[1rem] text-center" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <FormError message={error} />
-          <FormSuccess message={success} />
+          {error && <FormError message={error} />}
+          {success && <FormSuccess message={success} />}
           <Button
             type="submit"
             variant="custom"
@@ -145,7 +141,7 @@ export const RegisterForm = () => {
             className="w-full"
             disabled={isPending}
           >
-            Create An Account
+            Create an Account
           </Button>
         </form>
       </Form>

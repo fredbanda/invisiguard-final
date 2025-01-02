@@ -1,4 +1,3 @@
-import { newPassword } from "@/actions/new-password";
 import { UserRole } from "@prisma/client";
 import * as z from "zod";
 
@@ -9,11 +8,11 @@ export const LoginSchema = z.object({
 });
 
 export const RegisterSchema = z.object({
-    name: z.string().min(1, {message: "Name is required"}),
-    phone: z.string().min(10, {message: "Phone number is required"}),
-    email: z.string().email({message: "Apologies, but an email is required to proceed"}),
-    password: z.string().min(6, { message: "Password must be at least 6 characters long" })
-});
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    phone: z.string().optional(),
+  });
 
 export const ResetPasswordSchema = z.object({
     email: z.string().email({message: "Please enter a valid email to reset your password"}),

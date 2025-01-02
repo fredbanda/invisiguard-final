@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const domain = process.env.NEXT_PUBLIC_VERCEL_URL;
+const domain = process.env.NEXT_PUBLIC_APP_URL;
 
 const transporter = nodemailer.createTransport({
   host: 'mail.eunny.co.za', 
