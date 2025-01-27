@@ -42,21 +42,22 @@ const ProfilePage = () => {
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
-      name: user?.name || undefined,
-      phone: user?.phone || undefined,
-      company: user?.company || undefined,
-      address: user?.address || undefined,
-      street: user?.street || undefined,
-      city: user?.city || undefined,
-      province: user?.province || undefined,
-      country: user?.country || undefined,
-      postcode: user?.postcode || undefined,
-      email: user?.email || undefined,
-      role: user?.role || undefined,
-      password: undefined,
-      isTwoFactorEnabled: undefined,
+      name: user?.name || "", 
+      phone: user?.phone || "",
+      company: user?.company || "",
+      address: user?.address || "",
+      street: user?.street || "",
+      city: user?.city || "",
+      province: user?.province || "",
+      country: user?.country || "",
+      postcode: user?.postcode || "",
+      email: user?.email || "",
+      role: user?.role || UserRole.USER, 
+      password: user?.password || "",
+      isTwoFactorEnabled: false, 
     },
   });
+  
   const onSubmit = (values: z.infer<typeof SettingsSchema>) => {
     console.log(values);
 

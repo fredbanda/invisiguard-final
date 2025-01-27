@@ -1,6 +1,8 @@
+import { ReportList } from "@/components/modules/pen-test-form"
+
 const PenetrationTesting = () => {
   return (
-    <div>PenetrationTesting</div>
+    <ReportList />
   )
 }
 

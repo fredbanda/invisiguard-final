@@ -22,6 +22,12 @@ declare module "next-auth" {
   }
 }
 
+  interface PenTestReport {
+    id: string;
+    targetUrl: string;
+    status: string;
+  }
+  
 import { JWT } from "next-authjwt";
 
 declare module "next-auth/jwt" {
@@ -37,5 +43,6 @@ declare module "next-auth/jwt" {
     company: string;
     password?: hashedPassword;
     isTwoFactorEnabled?: boolean;
-  }
+    }
 }
+
