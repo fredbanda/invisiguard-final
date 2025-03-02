@@ -189,7 +189,7 @@ export async function POST(req: Request) {
     // Create report in database
     const scan = await db.scan.create({
       data: {
-        userId,
+        userId: userId ?? '',
         emails: emails || [],
         ips: ips || [],
         phones: phones || [],
@@ -198,6 +198,7 @@ export async function POST(req: Request) {
         pdfData: pdfBytes, // Store the PDF directly in the database
         createdAt: new Date()
       }
+      
     });
     
     return NextResponse.json({ 
