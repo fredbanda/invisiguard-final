@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+// biome-ignore lint/style/useImportType: <explanation>
 import { UserRole } from "@prisma/client";
 
 import { db } from "@/lib/db";
@@ -7,6 +8,9 @@ import authConfig from "@/auth.config";
 import { getUserById } from "@/data/user";
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 import { getAccountByUserId } from "./data/accounts";
+import { getFingerprintData } from "./data/fingerprint";
+import type { FingerprintData } from "./next-auth";
+
 
 export const {
   handlers: { GET, POST },
@@ -27,6 +31,7 @@ export const {
     },
   },
   callbacks: {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     async signIn({ user, account }: { user: any; account: any }) {
       try {
         // Allow OAuth accounts without email verification
@@ -38,6 +43,13 @@ export const {
           return false;
         }
 
+        const visitorId = await getFingerprintData(user.id);
+        await signIn("credentials", {
+          redirect: false,
+          visitorId,
+          callbackUrl: "/dashboard",
+        });
+      
         // Fetch the user by ID
         const existingUser = await getUserById(user.id);
 
@@ -70,10 +82,20 @@ export const {
       }
     },
     async session({ session, token }) {
-      console.log({ sessionToken: token });
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
+
+      if(!session.fingerprint){
+       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+       session.fingerprint = token.fingerprint as any;
+      }
+
+       // Include the full fingerprint data in the session
+        if (token.fingerprint) {
+          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          session.fingerprint = token.fingerprint as any;
+        }
 
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
@@ -96,19 +118,56 @@ export const {
         session.user.country = token.country as string;
         session.user.postcode = token.postcode as string;
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+        
       }
+
       return session;
     },
-    async jwt({ token }) {
+    async jwt({ token, user, account }) {
+      // Only set token.sub on first login
+      if (user) {
+        token.sub = user.id;
+      }
+    
+      // If visitorId is present in account, add it to token
+      if (account?.visitorId) {
+        token.visitorId = account.visitorId;
+      }
+    
+      // If no user id, return token early
       if (!token.sub) return token;
-
+    
+      // Fetch existing user details
       const existingUser = await getUserById(token.sub);
-
       if (!existingUser) return token;
-
+    
+      // Fetch fingerprint data if visitorId is present
+      if (token.visitorId) {
+        const fingerprintData = await getFingerprintData(token.visitorId as string);
+        if (fingerprintData) {
+          token.fingerprint = {
+            visitorId: fingerprintData.visitorId,
+            ip: fingerprintData.ip,
+            country: fingerprintData.country,
+            city: fingerprintData.city,
+            isp: fingerprintData.isp,
+            vpnOrProxy: fingerprintData.vpnOrProxy,
+            botProbability: fingerprintData.botProbability,
+            confidenceScore: fingerprintData.confidenceScore,
+            fraudScore: fingerprintData.fraudScore,
+            browser: fingerprintData.browser,
+            os: fingerprintData.os,
+            device: fingerprintData.device,
+            lastUpdated: fingerprintData.lastUpdated,
+          };
+        }
+      }
+    
+      // Fetch account information to determine if it's an OAuth user
       const existingAccount = await getAccountByUserId(existingUser.id);
-
       token.isOAuth = !!existingAccount;
+    
+      // Add user details to token
       token.role = existingUser.role;
       token.name = existingUser.name;
       token.email = existingUser.email;
@@ -121,9 +180,10 @@ export const {
       token.country = existingUser.country;
       token.postcode = existingUser.postcode;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-  
+    
       return token;
     },
+    
   },
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },

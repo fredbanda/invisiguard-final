@@ -18,6 +18,7 @@ const Footer = () => {
               href="#!"
               className="mr-6 text-neutral-100 dark:text-neutral-200"
             >
+              {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -31,6 +32,7 @@ const Footer = () => {
               href="#!"
               className="mr-6 text-neutral-100 dark:text-neutral-200"
             >
+              {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -44,6 +46,7 @@ const Footer = () => {
               href="#!"
               className="mr-6 text-neutral-100 dark:text-neutral-200"
             >
+              {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -61,6 +64,7 @@ const Footer = () => {
               href="#!"
               className="mr-6 text-neutral-100 dark:text-neutral-200"
             >
+              {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -74,6 +78,7 @@ const Footer = () => {
               href="#!"
               className="mr-6 text-neutral-100 dark:text-neutral-200"
             >
+              {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -84,6 +89,7 @@ const Footer = () => {
               </svg>
             </a>
             <a href="#!" className="text-neutral-100 dark:text-neutral-200">
+              {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -172,6 +178,7 @@ const Footer = () => {
                 Contact
               </h6>
               <p className="mb-4 flex items-center justify-center md:justify-start">
+                {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -184,6 +191,7 @@ const Footer = () => {
                 122 Loop Street, Cape Town
               </p>
               <p className="mb-4 flex items-center justify-center md:justify-start">
+                {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -198,6 +206,7 @@ const Footer = () => {
                 </Link>
               </p>
               <p className="mb-4 flex items-center justify-center md:justify-start">
+                {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -213,6 +222,7 @@ const Footer = () => {
                 <Link href={"tel:+27814412910"}>+ 081 440 2910</Link>
               </p>
               <p className="flex items-center justify-center md:justify-start">
+                {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -232,7 +242,7 @@ const Footer = () => {
         </div>
 
         <div className="text-neutral-100 p-6 text-center dark:bg-black">
-          <span>© 2013 - {currentYear}.  Copyright: </span>
+          <span>© {currentYear}. Copyright: </span>
           <a
             className="font-semibold text-neutral-100 dark:text-neutral-400"
             href="https://www.invisiguard.co.za/"

@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useTransition, useRef } from "react";
+import  type React from "react";
+import { useState, useTransition, useRef } from "react";
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { useForm } from "react-hook-form";
 import { LoginSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import type * as z from "zod";
 import {
   Form,
   FormControl,
@@ -118,6 +119,7 @@ export const LoginForm = () => {
                       <div className="flex gap-2">
                         {code.map((digit, index) => (
                           <Input
+                            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                             key={index}
                             ref={(el) => {
                               if (el) {

@@ -3,11 +3,11 @@ import nodemailer from 'nodemailer';
 const domain = process.env.NEXT_PUBLIC_APP_URL;
 
 const transporter = nodemailer.createTransport({
-  host: 'mail.eunny.co.za', 
+  host: 'mail.invisiguard.co.za', 
   port: 465, 
   secure: true, 
   auth: {
-    user: 'invisiguards@eunny.co.za', 
+    user: 'noreply@invisiguard.co.za', 
     pass: process.env.EMAIL_PASSWORD, 
   },
 });

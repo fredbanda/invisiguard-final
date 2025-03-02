@@ -7,7 +7,7 @@ import { getUserByEmail } from "@/data/user";
 import { Prisma } from "@prisma/client";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
-import * as z from "zod";
+import type * as z from "zod";
 
 export const register = async (values: z.infer<typeof RegisterSchema> | undefined) => {
   if (!values || typeof values !== "object") {

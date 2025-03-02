@@ -7,13 +7,13 @@ import { usePathname } from "next/navigation";
 export const DashboardNav = () => {
   const pathname = usePathname();
   return (
-    <nav className="bg-slate-200 flex justify-between items-center p-4 rounded-xl w-[640px] shadow-sm mt-12">
+    <nav className="bg-slate-200 flex justify-between items-center p-4 rounded-xl w-[720px] shadow-sm mt-12">
       <div className="flex gap-x-2">
         <Button
           asChild
-          variant={pathname === "/dashboard/reports" ? "default" : "outline"}
+          variant={pathname === "/dashboard/maxmind-report" ? "default" : "outline"}
         >
-          <Link href="/dashboard/reports">Reports</Link>
+          <Link href="/dashboard/maxmind-report">Reports</Link>
         </Button>
         <Button
           asChild
@@ -23,15 +23,21 @@ export const DashboardNav = () => {
         </Button>
         <Button
           asChild
+          variant={pathname === "/dashboard/ipqs-checker" ? "default" : "outline"}
+        >
+          <Link href="/dashboard/ipqs-checker">IPQS Checker</Link>
+        </Button>
+        <Button
+          asChild
           variant={pathname === "/dashboard/scam-scan" ? "default" : "outline"}
         >
           <Link href="/dashboard/scam-scan">Scam Scanner</Link>
         </Button>
         <Button
           asChild
-          variant={pathname === "/dashboard/identity-check" ? "default" : "outline"}
+          variant={pathname === "/dashboard/fingerprint" ? "default" : "outline"}
         >
-          <Link href="/dashboard/identity-check">Identity Check</Link>
+          <Link href="/dashboard/fingerprint">Fingerprint</Link>
         </Button>
         <Button
           asChild

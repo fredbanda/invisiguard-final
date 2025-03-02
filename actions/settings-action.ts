@@ -1,7 +1,7 @@
 "use server";
 
-import * as z from "zod";
-import { SettingsSchema } from "@/schemas";
+import type * as z from "zod";
+import type { SettingsSchema } from "@/schemas";
 import { db } from "@/lib/db";
 import { getUserByEmail, getUserById } from "@/data/user";
 import { currentUser } from "@/lib/auth";
@@ -25,6 +25,7 @@ export const settingsAction = async (values: z.infer<typeof SettingsSchema>) => 
         values.email = undefined;
         values.password = undefined;
         values.newPassword = undefined;
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         values.isTwoFactorEnabled = undefined as any;
     }
 

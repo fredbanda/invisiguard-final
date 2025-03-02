@@ -40,6 +40,8 @@ model User {
   postcode                                String?
   isTwoFactorEnabled                      Boolean         @default(false)
   twoFactorConfirmation                   TwoFactorConfirmation? 
+  fingerprint                             UserFingerprint[]
+  report                                  Report[]
 
   createdAt                               DateTime @default(now())
   updatedAt                               DateTime @updatedAt
@@ -48,14 +50,17 @@ model User {
 }
 
 model Scan {
-  id                                      String  @id @default(cuid())
-  userId                                  String  
-  user                                    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  emails                                  String[]
-  phones                                  String[]
-  domains                                 String[]
-  result                                  String?
-  createdAt                               DateTime @default(now())
+  id                                        String  @id @default(cuid())
+  userId                                    String
+  ips                                       String[]
+  user                                      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emails                                    String[]
+  phones                                    String[]
+  domains                                   String[]
+  result                                    String?  // Store a summary of the scan
+  pdfUrl                                    String?  // ✅ Store the generated PDF path or URL
+  pdfData                                   Bytes?   // OR store the PDF as binary data in PostgreSQL
+  createdAt                                 DateTime @default(now())
 
   @@map("scan")
 }
@@ -74,6 +79,68 @@ model PenTestReport {
   @@map("pen_test_report")
 }
 
+model Report {
+  id                                      String   @id @default(uuid())
+  userId                                  String   @db.Text
+  visitorId                               String? 
+  ipAddress                               String   @db.Text
+  email                                   String   @db.Text
+  iin                                     String?  // Credit Card Issuer Identification Number
+  eventTime                               DateTime
+  timezone                                String   @db.Text
+  billingCity                             String?
+  billingCountry                          String?  
+  billingPostalCode                       String?
+  billingPhone                            String?  
+  shippingAddress1                        String?  
+  shippingAddress2                        String?  
+  shippingCountry                         String?  
+  shippingPostalCode                      String?
+  riskScore                               Float?
+  minFraudData                            Json     
+  pdfUrl                                  String?  
+  createdAt                               DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("report")
+}
+
+model UserFingerprint {
+  id                                      String   @id @default(cuid())
+  userId                                  String
+  visitorId                               String
+  timestamp                               DateTime @default(now())
+
+  // Device information
+  browser                                String?
+  os                                      String?
+  device                                 String?
+  screenResolution                       String?
+  language                               String?
+  platform                               String?
+  timezone                               String?
+  touchScreen                            Boolean @default(false)
+
+  // Network Information
+  ipAddress                              String?
+  incognito                              Boolean @default(false)
+
+  // Security Analysis
+  confidenceScore                        Float @default(0)
+  botProbability                         Float @default(0)
+  vpnDetected                            Boolean @default(false)
+
+  // Metadata
+  createdAt                               DateTime @default(now())
+  updatedAt                               DateTime @updatedAt
+
+  user                                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+
+  @@map("user_fingerprint")
+}
  
 model Account {
   userId                                  String
@@ -147,4 +214,30 @@ model TwoFactorConfirmation {
   @@unique([userId])
 
   @@map("two_factor_confirmation")
+}
+
+model ProspectedClient {
+  id                                      String  @id @default(cuid())
+  contactName                             String
+  email                                   String
+  phone                                   String
+  role                                    String?
+  address                                 String?
+  companyName                             String?
+  industry                                String?
+  website                                 String?
+  preferredTime                           String[]
+  timezone                                String?
+  additionalNotes                         String?
+  serviceDescription                      String?
+  timeline                                String?
+  budget                                  String?
+  country                                 String?
+  companySize                             String?
+  annualRevenue                           String?
+
+  createdAt                               DateTime @default(now())
+  updatedAt                               DateTime @updatedAt
+
+  @@map("business")
 }

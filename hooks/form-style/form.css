@@ -1,0 +1,51 @@
+/* body {
+    @apply bg-neutral-magnolia;
+  }
+  
+  h1 {
+    @apply text-primary-marineBlue font-bold text-3xl;
+  }
+  
+  span.stepActive {
+    @apply bg-primary-lightBlue text-primary-marineBlue border-primary-lightBlue;
+  }
+  
+  button.primary {
+    @apply px-[26px] py-4 bg-primary-marineBlue font-semibold text-white rounded-lg capitalize text-sm;
+  }
+  
+  button.primary:disabled {
+    @apply bg-primary-marineBlue
+  }
+  
+  button.primary:disabled:hover {
+    @apply bg-primary-marineBlue
+  }
+  
+  button.primary:hover {
+    @apply bg-primary-marineBlue bg-opacity-90;
+  }
+  
+  button.secondary:hover {
+    @apply text-primary-marineBlue;
+  }
+  
+  input.default {
+    @apply outline-1 outline outline-neutral-coolGray w-full rounded-lg text-primary-marineBlue font-semibold px-4 py-[14px];
+  }
+  
+  input.default:focus {
+    @apply outline-1 outline outline-primary-marineBlue;
+  }
+  
+  input.default::placeholder {
+    @apply font-normal;
+  }
+  
+  label.default {
+    @apply text-primary-marineBlue text-[15px];
+  }
+  
+  .addon-checkbox {
+    @apply accent-primary-purplishBlue w-5 h-5 rounded-lg overflow-hidden;
+  }   */

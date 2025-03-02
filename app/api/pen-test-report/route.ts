@@ -16,6 +16,7 @@ export async function GET(req: Request) {
       const data = await db.penTestReport.findUnique({ where: { id } });
       if (!data) return NextResponse.json({ error: 'Data not found' }, { status: 404 });
       return NextResponse.json(data);
+    // biome-ignore lint/style/noUselessElse: <explanation>
     } else {
       const allData = await db.penTestReport.findMany();
       return NextResponse.json(allData);

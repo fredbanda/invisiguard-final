@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 
 const Hero = () => {
@@ -13,7 +12,13 @@ const Hero = () => {
                   Protect your business from attacks with security Invisiguard!
                 </h1>
                 <p className="mb-12 text-base !leading-relaxed text-gray-200 dark:text-body-color-dark sm:text-lg md:text-xl">
-                In today&apos;s digital landscape, online criminals constantly evolve their tactics, making businesses vulnerable to breaches and phishing scams. Invisiguard offers cutting-edge cybersecurity solutions, including phishing protection and penetration testing, to proactively defend your enterprise. Trust Invisiguard to secure your assets, ensure compliance, and build customer trust with robust, reliable protection.
+                  In today&apos;s digital landscape, online criminals constantly
+                  evolve their tactics, making businesses vulnerable to breaches
+                  and phishing scams. Invisiguard offers cutting-edge
+                  cybersecurity solutions, including phishing protection and
+                  penetration testing, to proactively defend your enterprise.
+                  Trust Invisiguard to secure your assets, ensure compliance,
+                  and build customer trust with robust, reliable protection.
                 </p>
                 <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                   <Link
@@ -23,7 +28,7 @@ const Hero = () => {
                     🔥 Talk To Sales
                   </Link>
                   <Link
-                    href="/quotation/form"
+                    href="/quotation"
                     className="inline-block rounded-md bg-black px-8 py-4 text-base font-semibold text-white/80 duration-300 ease-in-out hover:bg-black/90 dark:bg-white/10 dark:text-white dark:hover:bg-white/5"
                   >
                     Send Enquiry Form
@@ -34,6 +39,7 @@ const Hero = () => {
           </div>
         </div>
         <div className="absolute right-0 top-0 z-[-1] opacity-30 lg:opacity-100">
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
           <svg
             width="450"
             height="556"
@@ -172,6 +178,7 @@ const Hero = () => {
           </svg>
         </div>
         <div className="absolute bottom-0 left-0 z-[-1] opacity-30 lg:opacity-100">
+          {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
           <svg
             width="364"
             height="201"

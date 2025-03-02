@@ -4,8 +4,9 @@ import "./globals.css";
 import NavbarMain from "@/components/headers/nav-main";
 import { SessionProvider } from "next-auth/react";
 import Footer from "@/components/footers/footer";
-import {auth} from "@/auth";
-import {Toaster} from "sonner";
+import { auth } from "@/auth";
+import { Toaster } from "sonner";
+import FingerprintCapture from "@/components/modules/fingerprint-capture";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -20,7 +21,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Invisiguard | Security Solutions",
-  description: "Invisiguard is a security solutions company that provides a comprehensive suite of security services to help businesses protect their digital assets.",
+  description:
+    "Invisiguard is a security solutions company that provides a comprehensive suite of security services to help businesses protect their digital assets.",
 };
 
 export default async function RootLayout({
@@ -28,18 +30,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth()
-  
+  const session = await auth();
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider session={session}>
-        <NavbarMain />
-        {children}
-        <Toaster richColors />
-        <Footer />
+          <NavbarMain />
+          <FingerprintCapture />
+          {children}
+          <Toaster richColors />
+          <Footer />
         </SessionProvider>
       </body>
     </html>

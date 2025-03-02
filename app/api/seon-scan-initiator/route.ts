@@ -1,20 +1,27 @@
-import { PrismaClient } from '@prisma/client';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
+// biome-ignore lint/style/useImportType: <explanation>
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { generatePDF } from '@/utils/generatePDF';
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, emails, domains, phones } = await req.json();
+    const body = await req.json();
+    const { emails, domains, phones, userId } = body;
+    
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    }
+    
     const seonApiUrl = 'https://api.seon.io/SeonRestService/fraud-api/v2';
     const apiKey = process.env.SEON_API_KEY;
 
+    // Define the payload according to Seon's API documentation
     const payload = {
       config: {
         ip: { include: 'flags,history,id', version: 'v1' },
         email: { include: 'flags,history,id', version: 'v2' },
         phone: { include: 'flags,history,id', version: 'v1' },
+        domain_api: true,
         ip_api: true,
         email_api: true,
         phone_api: true,
@@ -22,7 +29,18 @@ export async function POST(req: NextRequest) {
       },
       email: emails[0] || '',
       phone_number: phones[0] || '',
+      // The domain might need to be extracted from the email instead
+      // or passed in a different way according to SEON's API
     };
+
+    // If we have a domain, let's extract it from the email or use the first domain
+    // if (emails && emails.length > 0 && emails[0]) {
+    //   // The domain is likely already extracted in your frontend
+    //   // If not, we can use the domains array directly
+    //   payload.domain_name = domains[0] || '';
+    // }
+
+    console.log('Payload:', payload);
 
     const response = await fetch(seonApiUrl, {
       method: 'POST',
@@ -34,39 +52,45 @@ export async function POST(req: NextRequest) {
     });
 
     const responseData = await response.json();
+    console.log('API Response:', responseData);
 
     if (!response.ok) {
-      throw new Error(
-        `Seon API error: ${responseData.error?.message || response.statusText}`
-      );
+      console.error('Seon API error:', responseData);
+      throw new Error(`Seon API error: ${responseData.error?.message || response.statusText}`);
     }
 
-    // Save scan details to the database
-    const scan = await prisma.scan.create({
+    // Generate a summary of the scan result
+    const resultSummary = JSON.stringify({
+      score: responseData.data?.score || 0,
+      recommendation: responseData.data?.recommendation || 'No recommendation',
+      timestamp: new Date().toISOString()
+    });
+
+    // Generate PDF
+    const pdfBytes = await generatePDF(responseData, 'SEON Scan Results');
+    
+    // Save to database
+    const scan = await db.scan.create({
       data: {
         userId,
         emails,
         phones,
         domains,
-        result: responseData,
-      },
+        result: resultSummary,
+        pdfData: Buffer.from(pdfBytes),
+        createdAt: new Date()
+      }
     });
 
-    return NextResponse.json({ scan }, { status: 200 });
-  } catch (error: unknown) {
-    console.log(error);
+    // Return success response with scan ID
+    return NextResponse.json({ 
+      success: true, 
+      scanId: scan.id,
+      message: "Scan completed and saved to database"
+    });
     
-    return NextResponse.json({error: "internal server error"}, { status: 500 });
-    
-    
+  } catch (error: any) {
+    console.error('Internal Server Error:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
-
-export function OPTIONS() {
-  return NextResponse.json(null, {
-    headers: {
-      Allow: 'POST, OPTIONS',
-    },
-    status: 204,
-  });
 }
