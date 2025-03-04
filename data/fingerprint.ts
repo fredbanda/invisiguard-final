@@ -14,7 +14,7 @@ export async function getFingerprintData(visitorId: string): Promise<Fingerprint
 
         return {
             visitorId: fingerprintData.visitorId,
-            ip: fingerprintData.ipAddress || "",
+            ips: fingerprintData.ips || "",
             country: "Unknown", // Adjust as needed
             city: "Unknown",    // Adjust as needed
             isp: "Unknown",     // Adjust as needed
@@ -25,7 +25,10 @@ export async function getFingerprintData(visitorId: string): Promise<Fingerprint
             browser: fingerprintData.browser || "",
             os: fingerprintData.os || "",
             device: fingerprintData.device || "",
-            lastUpdated: fingerprintData.updatedAt
+            lastUpdated: fingerprintData.updatedAt,
+            touchScreen: false, // Or get it from fingerprintData
+            incognito: false,   // Or get it from fingerprintData
+            vpnDetected: fingerprintData.vpnDetected,
         };
     } catch (error) {
         console.error("Error fetching fingerprint data:", error);

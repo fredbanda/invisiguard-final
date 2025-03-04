@@ -9,7 +9,7 @@ import { getUserById } from "@/data/user";
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 import { getAccountByUserId } from "./data/accounts";
 import { getFingerprintData } from "./data/fingerprint";
-import type { FingerprintData } from "./next-auth";
+
 
 
 export const {
@@ -147,7 +147,7 @@ export const {
         if (fingerprintData) {
           token.fingerprint = {
             visitorId: fingerprintData.visitorId,
-            ip: fingerprintData.ip,
+            ip: fingerprintData.ips,
             country: fingerprintData.country,
             city: fingerprintData.city,
             isp: fingerprintData.isp,

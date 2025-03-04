@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         platform: enhancedData.platform,
         timezone: enhancedData.timezone,
         touchScreen: enhancedData.touchScreen,
-        ipAddress: enhancedData.ipAddress,
+        ips: enhancedData.ipAddress,
         incognito: enhancedData.incognito,
         confidenceScore: enhancedData.confidenceScore,
         botProbability: enhancedData.botProbability,

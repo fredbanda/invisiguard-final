@@ -1,6 +1,6 @@
 "use client";
 
-import { createReport } from "@/actions/maxmind-report";
+
 import { useState } from "react";
 import {
   Select,
@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { createReport } from "@/actions/maxmind-report";
 
 export default function MaxMindReportForm() {
   const [formData, setFormData] = useState({

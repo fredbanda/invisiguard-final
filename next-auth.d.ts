@@ -26,13 +26,24 @@ export interface FingerprintData {
   screenResolution?: string | null;
   language?: string | null;
   platform?: string | null;
+  country?: string | null;
+  city?: string | null;
   timezone?: string | null;
   touchScreen: boolean;
-  ipAddress?: string | null;
+  isp?: string | null;
+  ips?: string | null;
+  vpnOrProxy?: boolean | null;
+  browser?: string | null;
+  fraudScore?: number | null;
   incognito: boolean;
   confidenceScore: number;
   botProbability: number;
   vpnDetected: boolean;
+  lastUpdated: Date;
+}
+
+export interface Report{
+  pdfUrl: string;
 }
 
 declare module "next-auth" {

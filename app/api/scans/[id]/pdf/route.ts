@@ -4,11 +4,11 @@ import { db } from '@/lib/db';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise< { id: string }> }
 ) {
   try {
     const scan = await db.scan.findUnique({
-      where: { id: params.id }
+      where: { id: (await params).id }
     });
 
     if (!scan || !scan.pdfData) {
