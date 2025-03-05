@@ -12,29 +12,6 @@ export async function POST(req: Request) {
     const  pdfBytes  = await generatePDF(fingerprintData, pdfName, fingerprintData);
     console.log("✅ PDF generated:", pdfBytes);
 
-<<<<<<< HEAD
-=======
-    // Save to database
-    const result = await db.userFingerprint.create({
-      data: {
-        userId: session.user.id,
-        visitorId: enhancedData.visitorId,
-        browser: enhancedData.browserName,
-        os: enhancedData.os,
-        device: enhancedData.device,
-        screenResolution: enhancedData.screenResolution,
-        language: enhancedData.language,
-        platform: enhancedData.platform,
-        timezone: enhancedData.timezone,
-        touchScreen: enhancedData.touchScreen,
-        ips: enhancedData.ipAddress,
-        incognito: enhancedData.incognito,
-        confidenceScore: enhancedData.confidenceScore,
-        botProbability: enhancedData.botProbability,
-        vpnDetected: enhancedData.vpnDetected
-      }
-    });
->>>>>>> 85440dc274a0fa7a5846d6e64c96d9ac664279b7
 
     // Save to the database
     const fingerprint = await db.userFingerprint.create({

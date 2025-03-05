@@ -1,6 +1,13 @@
 export interface FingerprintData {
     visitorId: string;
+    ips: string;
+    country: string;
+    city: string;
+    isp: string;
+    fraudScore: number;
+    vpnOrProxy: boolean;
     browserName?: string | null;
+    browser: string;
     os?: string | null;
     device?: string | null;
     screenResolution?: string | null;
@@ -13,4 +20,5 @@ export interface FingerprintData {
     confidenceScore: number;
     botProbability: number;
     vpnDetected: boolean;
+    lastUpdated: Date;
   }

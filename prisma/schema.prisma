@@ -217,7 +217,7 @@ model UserFingerprint {
 
   // Device information
   browser                                String?
-  os                                      String?
+  os                                     String?
   device                                 String?
   screenResolution                       String?
   language                               String?
@@ -226,7 +226,7 @@ model UserFingerprint {
   touchScreen                            Boolean @default(false)
 
   // Network Information
-  ipAddress                              String?
+  ips                                    String?
   incognito                              Boolean @default(false)
 
   // Security Analysis
