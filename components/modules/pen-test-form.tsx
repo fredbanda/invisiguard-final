@@ -121,6 +121,7 @@ export  function ReportList() {
                 <td className="border border-gray-300 px-4 py-2">{report.status}</td>
                 <td className="border border-gray-300 px-4 py-2">
                   <button
+                  type="button"
                     onClick={() => handleViewReport(report.id)}
                     className="text-blue-600 hover:underline"
                   >

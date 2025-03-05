@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { generatePDF } from "@/utils/generatePDF";
@@ -32,7 +33,7 @@ const SeonScanComponent = () => {
       setScanResults(data);
 
       // Generate PDF
-      const pdfBytes = await generatePDF(data, "Seon Scan Results");
+      const pdfBytes = await generatePDF(data, "Seon Scan Results", null);
 
       // Trigger PDF download
       const blob = new Blob([pdfBytes], { type: "application/pdf" });

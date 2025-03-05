@@ -1,8 +1,9 @@
-import type { NextRequest } from "next/server";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise< { id: string }> }) {
   try {
     const session = await auth();
     if (!session?.user) {
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 
     const report = await db.scan.findUnique({
-      where: { id: params.id, userId: session.user.id },
+      where: { id: (await params).id, userId: session.user.id },
       select: { pdfData: true }, // Ensure this field exists
     });
 
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="report-${await(params).id}.pdf"`,
+        "Content-Disposition": `attachment; filename="report-${(await params).id}.pdf"`,
       },
     });
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>

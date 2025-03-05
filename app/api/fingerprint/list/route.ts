@@ -1,26 +1,21 @@
-// app/api/fingerprint/list/route.ts
-import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { auth } from '@/auth';
+import { NextResponse } from "next/server";
+
+import { db } from "@/lib/db";
 
 export async function GET() {
-  try {
-    const session = await auth();
-    
-    // Verify the user is an admin or has permission to view fingerprints
-    if (!session?.user?.id || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
+    try{
     const fingerprints = await db.userFingerprint.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 100 // Limit to recent 100 entries
+        include: { pdfData: true },
+        orderBy: {createdAt: 'desc'}
     });
-    console.log(fingerprints);
+
+    console.log("Fetched fingerprints:", fingerprints);
     
-    return NextResponse.json(fingerprints);
-  } catch (error) {
-    console.error('API error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
+
+    return NextResponse.json({ fingerprints }, { status: 200 });
+    } catch (error) {
+        console.log("Error fetching fingerprints:", error); 
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        
+    }
 }

@@ -1,8 +1,7 @@
-// components/FingerprintDashboard.tsx
 'use client';
 
+import FingerprintCollector from '@/components/fingerprint/fingerprint-collector';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 type UserFingerprint = {
   id: string;
@@ -16,20 +15,17 @@ type UserFingerprint = {
   createdAt: string;
 };
 
-export default function FingerprintDashboard(): JSX.Element {
+export default function FingerprintDashboard() {
   const [fingerprints, setFingerprints] = useState<UserFingerprint[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFingerprints = async () => {
       try {
         const response = await fetch('/api/fingerprint/list');
-        if (!response.ok) {
-          throw new Error('Failed to fetch fingerprints');
-        }
+        if (!response.ok) throw new Error('Failed to fetch fingerprints');
         const data = await response.json();
-        setFingerprints(data);
+        setFingerprints(data || []); // Ensure it's an array
       } catch (error) {
         console.error('Error fetching fingerprints:', error);
       } finally {
@@ -40,11 +36,11 @@ export default function FingerprintDashboard(): JSX.Element {
     fetchFingerprints();
   }, []);
 
-  if (loading) {
-    return <div>Loading fingerprint data...</div>;
-  }
+  if (loading) return <div>Loading fingerprint data...</div>;
 
   return (
+    <>
+    <FingerprintCollector />
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">User Fingerprints</h1>
       
@@ -63,23 +59,30 @@ export default function FingerprintDashboard(): JSX.Element {
             </tr>
           </thead>
           <tbody>
-            {fingerprints.map((fp) => (
-              <tr key={fp.id} className="hover:bg-gray-50">
-                <td className="p-2 border">{fp.visitorId.substring(0, 8)}...</td>
-                <td className="p-2 border">{fp.browser || 'Unknown'}</td>
-                <td className="p-2 border">{fp.os || 'Unknown'}</td>
-                <td className="p-2 border">{fp.device || 'Unknown'}</td>
-                <td className="p-2 border">{(fp.confidenceScore * 100).toFixed(1)}%</td>
-                <td className="p-2 border">{(fp.botProbability * 100).toFixed(1)}%</td>
-                <td className="p-2 border">{fp.vpnDetected ? 'Yes' : 'No'}</td>
-                <td className="p-2 border">{new Date(fp.createdAt).toLocaleString()}</td>
+            {Array.isArray(fingerprints) && fingerprints.length > 0 ? (
+              fingerprints.map((fp) => (
+                <tr key={fp.id} className="hover:bg-gray-50">
+                  <td className="p-2 border">{fp.visitorId.substring(0, 8)}...</td>
+                  <td className="p-2 border">{fp.browser || 'Unknown'}</td>
+                  <td className="p-2 border">{fp.os || 'Unknown'}</td>
+                  <td className="p-2 border">{fp.device || 'Unknown'}</td>
+                  <td className="p-2 border">{(fp.confidenceScore * 100).toFixed(1)}%</td>
+                  <td className="p-2 border">{(fp.botProbability * 100).toFixed(1)}%</td>
+                  <td className="p-2 border">{fp.vpnDetected ? 'Yes' : 'No'}</td>
+                  <td className="p-2 border">{new Date(fp.createdAt).toLocaleString()}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={8} className="text-center p-2 border">
+                  No fingerprint data available
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
     </div>
+    </>
   );
 }
- 
-

@@ -42,11 +42,114 @@ model User {
   twoFactorConfirmation                   TwoFactorConfirmation? 
   fingerprint                             UserFingerprint[]
   report                                  Report[]
+  maxmindTransactions                     MaxMindTransaction[]
 
   createdAt                               DateTime @default(now())
   updatedAt                               DateTime @updatedAt
 
   @@map("user")
+}
+
+model MaxMindTransaction {
+  id                                     String   @id @default(cuid())
+  userId                                 String
+  createdAt                              DateTime @default(now())
+  updatedAt                              DateTime @updatedAt
+
+  // Device Information
+  deviceIpAddress                        String
+
+  // Event Details
+  eventShopId                            String
+  eventTime                              DateTime
+  eventTransactionId                     String
+  eventType                              String
+
+  // Account Information
+  accountUserId        String
+  accountUsername      String
+
+  // Email Details
+  emailAddress         String
+  emailDomain          String
+
+  // Billing Information
+  billingAddress       String
+  billingAddress2      String?
+  billingCity          String
+  billingCompany       String?
+  billingCountry       String
+  billingFirstName     String
+  billingLastName      String
+  billingPhoneCountryCode String
+  billingPhoneNumber   String
+  billingPostal        String
+  billingRegion        String
+
+  // Shipping Information
+  shippingAddress      String
+  shippingAddress2     String?
+  shippingCity         String
+  shippingCompany      String?
+  shippingCountry      String
+  shippingDeliverySpeed String
+  shippingFirstName    String
+  shippingLastName     String
+  shippingPhoneCountryCode String
+  shippingPhoneNumber  String
+  shippingPostal       String
+  shippingRegion       String
+
+  // Payment Details
+  paymentDeclineCode   String?
+  paymentProcessor     String
+  paymentWasAuthorized Boolean
+
+  // Credit Card Information
+  creditCardAvsResult  String
+  creditCardBankName   String?
+  creditCardBankPhoneCountryCode String?
+  creditCardBankPhoneNumber String?
+  creditCardCvvResult  String
+  creditCardIssuerIdNumber String
+  creditCardLastDigits String
+  creditCardToken      String?
+  creditCardWas3DSecureSuccessful Boolean
+
+  // Order Details
+  orderAffiliateId     String?
+  orderAmount          Float
+  orderCurrency        String
+  orderDiscountCode    String?
+  orderHasGiftMessage  Boolean
+  orderIsGift          Boolean
+  orderReferrerUri     String?
+  orderSubaffiliateId  String?
+
+  // Risk Scoring
+  riskScore            Float
+  ipAddressRisk        Int
+
+  // Shopping Cart Items
+  shoppingCartItems    ShoppingCartItem[]
+
+  // Generated PDF
+  generatedPdf         Bytes?
+
+  user                 User? @relation(fields: [accountUserId], references: [id])
+
+  @@map("maxmind_transactions")
+}
+
+model ShoppingCartItem {
+  id                   String   @id @default(cuid())
+  transactionId        String
+  category             String
+  itemId               String
+  price                Float
+  quantity             Int
+
+  transaction          MaxMindTransaction @relation(fields: [transactionId], references: [id])
 }
 
 model Scan {
@@ -130,6 +233,7 @@ model UserFingerprint {
   confidenceScore                        Float @default(0)
   botProbability                         Float @default(0)
   vpnDetected                            Boolean @default(false)
+  pdfData                                 PdfData[]
 
   // Metadata
   createdAt                               DateTime @default(now())
@@ -140,6 +244,19 @@ model UserFingerprint {
   @@index([userId])
 
   @@map("user_fingerprint")
+}
+
+model PdfData {
+  id                                      String   @id @default(cuid())
+  fingerprintId                           String  @unique
+  pdfName                                 String
+  pdfBytes                                Bytes
+  createdAt                               DateTime @default(now())
+
+  fingerprint                              UserFingerprint @relation(fields: [fingerprintId], references: [id], onDelete: Cascade)
+ 
+
+  @@map("pdf_data")
 }
  
 model Account {

@@ -1,4 +1,6 @@
 // biome-ignore lint/style/useImportType: <explanation>
+import { Transaction } from "@maxmind/minfraud-api-node";
+// biome-ignore lint/style/useImportType: <explanation>
 import { UserRole } from "@prisma/client";
 import NextAuth, { type DefaultSession } from "next-auth";
 
@@ -18,7 +20,7 @@ export type ExtendedUser = DefaultSession["user"] & {
   
 }
 
-export interface FingerprintData {
+export interface UserFingerprint {
   visitorId: string;
   browserName?: string | null;
   os?: string | null;
@@ -52,6 +54,7 @@ declare module "next-auth" {
       os: string; 
       device: string;
       lastUpdated: Date;
+      pdfBytes: Uint8Array;
       }
     } 
   }
@@ -62,6 +65,12 @@ declare module "next-auth" {
     id: string;
     targetUrl: string;
     status: string;
+  }
+
+  interface formattedRequest {
+    email: {
+      address: email
+    };
   }
 
   interface Scan{

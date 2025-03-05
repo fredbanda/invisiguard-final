@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse } from "next/server";
 import { PDFDocument } from "pdf-lib";
 import { db } from "@/lib/db";
@@ -79,14 +81,16 @@ export async function GET(req: Request) {
     y -= 10;
     
     // Format JSON data for readability
-    const minFraudData = report.minFraudData as any;
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            const minFraudData = report.minFraudData as any;
     
     // Add email results
     if (minFraudData.emailResults && minFraudData.emailResults.length > 0) {
       addText("Email Validation Results:", 13);
       y -= 5;
       
-      minFraudData.emailResults.forEach((result: any, index: number) => {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            minFraudData.emailResults.forEach((result: any, index: number) => {
         addText(`${index + 1}. ${result.email || 'Unknown email'}`, fontSize, 50, 10);
         if (result.fraud_score !== undefined) {
           addText(`   Fraud Score: ${result.fraud_score}`, fontSize - 1, 50, 20);
@@ -108,7 +112,8 @@ export async function GET(req: Request) {
       addText("IP Validation Results:", 13);
       y -= 5;
       
-      minFraudData.ipResults.forEach((result: any, index: number) => {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            minFraudData.ipResults.forEach((result: any, index: number) => {
         addText(`${index + 1}. ${result.ip_address || 'Unknown IP'}`, fontSize, 50, 10);
         if (result.fraud_score !== undefined) {
           addText(`   Fraud Score: ${result.fraud_score}`, fontSize - 1, 50, 20);
@@ -137,3 +142,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Failed to generate PDF" }, { status: 500 });
   }
 }
+

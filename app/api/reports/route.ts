@@ -1,8 +1,8 @@
-import type { NextRequest } from "next/server";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { auth } from "@/auth"; // NextAuth authentication
 import { db } from "@/lib/db"; // db Client
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
     if (!session?.user) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { getFormCount, getPlanPrice } from "@/lib/formData";
+// biome-ignore lint/style/useImportType: <explanation>
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface UserData {
@@ -125,6 +126,7 @@ export const StateContext = ({ children }: StateContextProps) => {
 
       if (addons && addons.length > 0) {
         let addonPrice = 0;
+        // biome-ignore lint/complexity/noForEach: <explanation>
         addons.forEach((addon) => {
           if (yearly) {
             addonPrice += addon.yearlyPrice;

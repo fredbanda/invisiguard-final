@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // biome-ignore lint/style/useImportType: <explanation>
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -67,7 +69,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Generate PDF
-    const pdfBytes = await generatePDF(responseData, 'SEON Scan Results');
+    const pdfBytes = await generatePDF(responseData, 'SEON Scan Results', resultSummary);
     
     // Save to database
     const scan = await db.scan.create({
@@ -89,7 +91,8 @@ export async function POST(req: NextRequest) {
       message: "Scan completed and saved to database"
     });
     
-  } catch (error: any) {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      } catch (error: any) {
     console.error('Internal Server Error:', error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

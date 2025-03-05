@@ -6,7 +6,7 @@ import { SessionProvider } from "next-auth/react";
 import Footer from "@/components/footers/footer";
 import { auth } from "@/auth";
 import { Toaster } from "sonner";
-import FingerprintCapture from "@/components/modules/fingerprint-capture";
+import { FpjsProvider } from "@fingerprintjs/fingerprintjs-pro-react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,8 +39,15 @@ export default async function RootLayout({
       >
         <SessionProvider session={session}>
           <NavbarMain />
-          <FingerprintCapture />
+          <FpjsProvider
+      loadOptions={{
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        apiKey: process.env.NEXT_PUBLIC_FINGERPRINTJS_API_KEY!,
+        region: "us",
+      }}
+    >
           {children}
+          </FpjsProvider>
           <Toaster richColors />
           <Footer />
         </SessionProvider>

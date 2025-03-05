@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse } from "next/server";
 import { PDFDocument, rgb } from "pdf-lib";
 import { db } from "@/lib/db";
@@ -12,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { emails, phones, ips, domains, visitorId } = await req.json();
+    const { emails, phones, ips, domains } = await req.json();
     const userId = session.user.id;
 
     if (!emails && !phones && !ips && !domains) {
@@ -185,6 +187,8 @@ export async function POST(req: Request) {
 
     // Extract geolocation data from IP check if available
     const ipData = ipResults.length > 0 ? ipResults[0] : null;
+    console.log('IP Data:', ipData);
+    
     
     // Create report in database
     const scan = await db.scan.create({

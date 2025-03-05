@@ -1,7 +1,9 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
-export async function generatePDF(scanResults: any, title: string): Promise<Uint8Array> {
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export async function generatePDF(scanResults: any, title: string, fingerprintData: any): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
+  const { pdfBytes } = fingerprintData;
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
 
   const pageSize: [number, number] = [595.2, 841.8]; // A4 size in points
@@ -26,6 +28,7 @@ export async function generatePDF(scanResults: any, title: string): Promise<Uint
     textY -= 40; // Space below the title
     const lines = text.split('\n');
 
+    // biome-ignore lint/complexity/noForEach: <explanation>
     lines.forEach((line) => {
       // If there's no space left on the page, add a new page
       if (textY < margin + fontSize) {
@@ -69,8 +72,5 @@ export async function generatePDF(scanResults: any, title: string): Promise<Uint
     addPageWithText(pageLines, pageNumber);
     pageNumber++;
   }
-
-  // PDF generation
-  const pdfBytes = await pdfDoc.save();
-  return pdfBytes;
+return pdfBytes;
 }

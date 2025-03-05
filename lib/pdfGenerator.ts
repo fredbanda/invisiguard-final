@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>

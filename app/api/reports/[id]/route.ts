@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 

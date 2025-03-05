@@ -8,8 +8,8 @@ import authConfig from "@/auth.config";
 import { getUserById } from "@/data/user";
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 import { getAccountByUserId } from "./data/accounts";
-import { getFingerprintData } from "./data/fingerprint";
-import type { FingerprintData } from "./next-auth";
+//import { getFingerprintData } from "./data/fingerprint";
+//import type { FingerprintData } from "./next-auth";
 
 
 export const {
@@ -43,12 +43,12 @@ export const {
           return false;
         }
 
-        const visitorId = await getFingerprintData(user.id);
-        await signIn("credentials", {
-          redirect: false,
-          visitorId,
-          callbackUrl: "/dashboard",
-        });
+        // const visitorId = await getFingerprintData(user.id);
+        // await signIn("credentials", {
+        //   redirect: false,
+        //   visitorId,
+        //   callbackUrl: "/dashboard",
+        // });
       
         // Fetch the user by ID
         const existingUser = await getUserById(user.id);
@@ -142,26 +142,26 @@ export const {
       if (!existingUser) return token;
     
       // Fetch fingerprint data if visitorId is present
-      if (token.visitorId) {
-        const fingerprintData = await getFingerprintData(token.visitorId as string);
-        if (fingerprintData) {
-          token.fingerprint = {
-            visitorId: fingerprintData.visitorId,
-            ip: fingerprintData.ip,
-            country: fingerprintData.country,
-            city: fingerprintData.city,
-            isp: fingerprintData.isp,
-            vpnOrProxy: fingerprintData.vpnOrProxy,
-            botProbability: fingerprintData.botProbability,
-            confidenceScore: fingerprintData.confidenceScore,
-            fraudScore: fingerprintData.fraudScore,
-            browser: fingerprintData.browser,
-            os: fingerprintData.os,
-            device: fingerprintData.device,
-            lastUpdated: fingerprintData.lastUpdated,
-          };
-        }
-      }
+      // if (token.visitorId) {
+      //   const fingerprintData = await getFingerprintData(token.visitorId as string);
+      //   if (fingerprintData) {
+      //     token.fingerprint = {
+      //       visitorId: fingerprintData.visitorId,
+      //       ip: fingerprintData.ip,
+      //       country: fingerprintData.country,
+      //       city: fingerprintData.city,
+      //       isp: fingerprintData.isp,
+      //       vpnOrProxy: fingerprintData.vpnOrProxy,
+      //       botProbability: fingerprintData.botProbability,
+      //       confidenceScore: fingerprintData.confidenceScore,
+      //       fraudScore: fingerprintData.fraudScore,
+      //       browser: fingerprintData.browser,
+      //       os: fingerprintData.os,
+      //       device: fingerprintData.device,
+      //       lastUpdated: fingerprintData.lastUpdated,
+      //     };
+      //   }
+      // }
     
       // Fetch account information to determine if it's an OAuth user
       const existingAccount = await getAccountByUserId(existingUser.id);
