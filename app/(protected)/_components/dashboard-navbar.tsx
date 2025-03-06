@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 export const DashboardNav = () => {
   const pathname = usePathname();
   return (
-    <nav className="bg-slate-200 flex justify-between items-center p-4 rounded-xl w-[720px] shadow-sm mt-12">
+    <nav className="bg-slate-200 flex justify-between items-center p-4 rounded-xl w-[860px] shadow-sm mt-12">
       <div className="flex gap-x-2">
         <Button
           asChild
@@ -32,6 +32,12 @@ export const DashboardNav = () => {
           variant={pathname === "/dashboard/scam-scan" ? "default" : "outline"}
         >
           <Link href="/dashboard/scam-scan">Scam Scanner</Link>
+        </Button>
+        <Button
+          asChild
+          variant={pathname === "/dashboard/maxmind-query-form" ? "default" : "outline"}
+        >
+          <Link href="/dashboard/maxmind-query-form">MinMax Report</Link>
         </Button>
         <Button
           asChild

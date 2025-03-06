@@ -9,15 +9,37 @@ export default {
   ],
   theme: {
   	extend: {
-		keyframes: {
-			zoom: {
-			  '0%, 100%': { transform: 'scale(1)' },
-			  '50%': { transform: 'scale(1.2)' },
-			},
-		  },
-		  animation: {
-			zoom: 'zoom 1.5s infinite',
-		  },
+  		keyframes: {
+  			zoom: {
+  				'0%, 100%': {
+  					transform: 'scale(1)'
+  				},
+  				'50%': {
+  					transform: 'scale(1.2)'
+  				}
+  			},
+  			'accordion-down': {
+  				from: {
+  					height: '0'
+  				},
+  				to: {
+  					height: 'var(--radix-accordion-content-height)'
+  				}
+  			},
+  			'accordion-up': {
+  				from: {
+  					height: 'var(--radix-accordion-content-height)'
+  				},
+  				to: {
+  					height: '0'
+  				}
+  			}
+  		},
+  		animation: {
+  			zoom: 'zoom 1.5s infinite',
+  			'accordion-down': 'accordion-down 0.2s ease-out',
+  			'accordion-up': 'accordion-up 0.2s ease-out'
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -27,25 +49,24 @@ export default {
   			},
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))',
-
+  				foreground: 'hsl(var(--popover-foreground))'
   			},
   			primary: {
   				DEFAULT: 'hsl(var(--primary))',
   				foreground: 'hsl(var(--primary-foreground))',
-				  marineBlue: "hsl(213, 96%, 18%)",
-				  purplishBlue: "hsl(243, 100%, 62%)",
-				  pastelBlue: "hsl(228, 100%, 84%)",
-				  lightBlue: "hsl(206, 94%, 87%)",
-				  strawberryRed: "hsl(354, 84%, 57%)"
+  				marineBlue: 'hsl(213, 96%, 18%)',
+  				purplishBlue: 'hsl(243, 100%, 62%)',
+  				pastelBlue: 'hsl(228, 100%, 84%)',
+  				lightBlue: 'hsl(206, 94%, 87%)',
+  				strawberryRed: 'hsl(354, 84%, 57%)'
   			},
-			  neutral: {
-				coolGray: "hsl(231, 11%, 63%)",
-				lightGray: "hsl(229, 24%, 87%)",
-				magnolia: "hsl(217, 100%, 97%)",
-				alabaster: "hsl(231, 100%, 99%)",
-				white: "hsl(0, 0%, 100%)",
-			  },
+  			neutral: {
+  				coolGray: 'hsl(231, 11%, 63%)',
+  				lightGray: 'hsl(229, 24%, 87%)',
+  				magnolia: 'hsl(217, 100%, 97%)',
+  				alabaster: 'hsl(231, 100%, 99%)',
+  				white: 'hsl(0, 0%, 100%)'
+  			},
   			secondary: {
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
@@ -62,10 +83,10 @@ export default {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
-			  backgroundImage: {
-				'sidebar-desktop': 'url(/images/bg-sidebar-desktop.svg)',
-				'sidebar-mobile': 'url(/images/bg-sidebar-mobile.svg)'
-			  },
+  			backgroundImage: {
+  				'sidebar-desktop': 'url(/images/bg-sidebar-desktop.svg)',
+  				'sidebar-mobile': 'url(/images/bg-sidebar-mobile.svg)'
+  			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
@@ -83,7 +104,6 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		}
   	}
-	
   },
   
   plugins: [require("tailwindcss-animate")],
