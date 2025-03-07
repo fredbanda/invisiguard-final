@@ -30,7 +30,7 @@ export async function POST(req: Request) {
             confidenceScore: body.confidenceScore,
             botProbability: body.botProbability,
             vpnDetected: body.vpnDetected,
-            ipAddress: body.ipAddress
+            ips: body.ipAddress
         }
      });
      console.log("✅ Fingerprint saved successfully:", fingerprint);

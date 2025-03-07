@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { generatePdfForTransaction } from '@/lib/pdf-generator';
+import { generateMinFraudReport } from '@/lib/pdf-generator';
 
 const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise< { id: string }> }
 ) {
   try {
-    const transactionId = params.id;
+    const transactionId = (await params).id;
     
     // Get the transaction with PDF bytes
     const transaction = await prisma.maxMindTransaction.findUnique({
@@ -27,13 +27,14 @@ export async function GET(
     // If the PDF doesn't exist, generate it
     let pdfBytes = transaction.generatedPdf;
     if (!pdfBytes) {
-      pdfBytes = await generatePdfForTransaction(transaction);
+      pdfBytes = await generateMinFraudReport(transaction, transaction.id);
       
       // Save the generated PDF to the database
       await prisma.maxMindTransaction.update({
         where: { id: transactionId },
         data: { generatedPdf: pdfBytes },
       });
+
     }
     
     // Return the PDF as an attachment
