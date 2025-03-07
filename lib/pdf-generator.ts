@@ -1,232 +1,146 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-// biome-ignore lint/style/useImportType: <explanation>
-import { MaxMindTransaction } from '@prisma/client';
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib"
 
-export async function generatePdfForTransaction(transaction: MaxMindTransaction): Promise<Buffer> {
-  // Create a new PDF document
-  const pdfDoc = await PDFDocument.create();
-  
-  // Add a page to the document
-  const page = pdfDoc.addPage();
-  
-  // Get the standard font
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  
-  // Set some styles
-  const fontSize = 12;
-  const lineHeight = fontSize * 1.2;
-  const margin = 50;
-  
-  // Set the page dimensions
-  const { width, height } = page.getSize();
-  
-  // Add a title
-  page.drawText('MaxMind Transaction Report', {
-    x: margin,
-    y: height - margin,
-    size: 24,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  
-  // Add transaction ID and date
-  page.drawText(`Transaction ID: ${transaction.id}`, {
-    x: margin,
-    y: height - margin - lineHeight * 2,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  page.drawText(`Date: ${transaction.createdAt.toLocaleString()}`, {
-    x: margin,
-    y: height - margin - lineHeight * 3,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  // Add risk score information
-  page.drawText(`Risk Score: ${transaction.riskScore}`, {
-    x: margin,
-    y: height - margin - lineHeight * 5,
-    size: fontSize + 2,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  
-  page.drawText(`IP Address Risk: ${transaction.ipAddressRisk}`, {
-    x: margin,
-    y: height - margin - lineHeight * 6,
-    size: fontSize + 2,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  
-  // Draw a line
-  page.drawLine({
-    start: { x: margin, y: height - margin - lineHeight * 7 },
-    end: { x: width - margin, y: height - margin - lineHeight * 7 },
-    thickness: 1,
-    color: rgb(0, 0, 0),
-  });
-  
-  // Transaction details
-  let lineCount = 8;
-  
-  // Account Information
-  // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
-      page.drawText(`Account Information`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`User ID: ${transaction.accountUserId}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Username: ${transaction.accountUsername}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 2;
-  // Billing Information
-  // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
-    page.drawText(`Billing Information`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Name: ${transaction.billingFirstName} ${transaction.billingLastName}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Address: ${transaction.billingAddress}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`City: ${transaction.billingCity}, ${transaction.billingRegion}, ${transaction.billingPostal}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Country: ${transaction.billingCountry}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 2;
-  // Order Information
-  // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
-    page.drawText(`Order Information`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Amount: ${transaction.orderAmount} ${transaction.orderCurrency}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Payment Authorized: ${transaction.paymentWasAuthorized ? 'Yes' : 'No'}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  // If page is full, add another page
-  if (lineCount * lineHeight > height - 2 * margin) {
-    const newPage = pdfDoc.addPage();
-    const page = newPage;
-    lineCount = 2; // Reset line count with some margin
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export async function generateMinFraudReport(result: any, formData: any) {
+  try {
+    // Create a new PDF document
+    const pdfDoc = await PDFDocument.create()
+
+    // Add a page to the document
+    const page = pdfDoc.addPage([595.28, 841.89]) // A4 size
+
+    // Get fonts
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+    const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+
+    // Set page margins
+    const margin = 50
+
+    // Add title
+    page.drawText("MinFraud Risk Analysis Report", {
+      x: margin,
+      y: page.getHeight() - margin,
+      size: 18,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    })
+
+    // Add date
+    const date = new Date().toLocaleString()
+    page.drawText(`Generated on: ${date}`, {
+      x: margin,
+      y: page.getHeight() - margin - 25,
+      size: 10,
+      font: helveticaFont,
+      color: rgb(0.4, 0.4, 0.4),
+    })
+
+    // Add transaction details
+    page.drawText("Transaction Details", {
+      x: margin,
+      y: page.getHeight() - margin - 60,
+      size: 14,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    })
+
+    const transactionDetails = [
+      `Transaction ID: ${formData.transactionId || "N/A"}`,
+      `Amount: ${formData.transactionAmount || "N/A"} ${formData.transactionCurrency || "USD"}`,
+      `Type: ${formData.transactionType || "N/A"}`,
+      `Shop ID: ${formData.shopId || "N/A"}`,
+    ]
+
+    let yPos = page.getHeight() - margin - 85
+    // biome-ignore lint/complexity/noForEach: <explanation>
+    transactionDetails.forEach((detail) => {
+      page.drawText(detail, {
+        x: margin,
+        y: yPos,
+        size: 10,
+        font: helveticaFont,
+        color: rgb(0, 0, 0),
+      })
+      yPos -= 15
+    })
+
+    // Add risk scores
+    page.drawText("Risk Assessment", {
+      x: margin,
+      y: yPos - 20,
+      size: 14,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    })
+
+    yPos -= 45
+
+    const riskScores = [
+      `Overall Risk Score: ${result.riskScore.toFixed(1)}`,
+      `Fraud Score: ${result.fraudScore.toFixed(1)}`,
+      `IP Risk Score: ${result.ipRiskScore.toFixed(1)}`,
+    ]
+
+    // biome-ignore lint/complexity/noForEach: <explanation>
+    riskScores.forEach((score) => {
+      page.drawText(score, {
+        x: margin,
+        y: yPos,
+        size: 10,
+        font: helveticaFont,
+        color: rgb(0, 0, 0),
+      })
+      yPos -= 15
+    })
+
+    // Add recommendations
+    page.drawText("Recommendations", {
+      x: margin,
+      y: yPos - 20,
+      size: 14,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    })
+
+    yPos -= 45
+
+    if (result.recommendations && result.recommendations.length > 0) {
+      result.recommendations.forEach((rec: string, index: number) => {
+        page.drawText(`${index + 1}. ${rec}`, {
+          x: margin,
+          y: yPos,
+          size: 10,
+          font: helveticaFont,
+          color: rgb(0, 0, 0),
+        })
+        yPos -= 15
+      })
+    } else {
+      page.drawText("No recommendations available.", {
+        x: margin,
+        y: yPos,
+        size: 10,
+        font: helveticaFont,
+        color: rgb(0, 0, 0),
+      })
+      yPos -= 15
+    }
+
+    // Add footer
+    page.drawText("This report was generated based on MaxMind minFraud analysis.", {
+      x: margin,
+      y: margin,
+      size: 8,
+      font: helveticaFont,
+      color: rgb(0.4, 0.4, 0.4),
+    })
+
+    // Serialize the PDF to bytes
+    const pdfBytes = await pdfDoc.save()
+    return pdfBytes
+  } catch (error) {
+    console.error("Error generating PDF:", error)
+    throw error
   }
-  
-  lineCount += 2;
-  // Credit Card Information
-  // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
-    page.drawText(`Credit Card Information`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Last Digits: ${transaction.creditCardLastDigits}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Issuer ID: ${transaction.creditCardIssuerIdNumber}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  lineCount += 1;
-  page.drawText(`Bank: ${transaction.creditCardBankName || 'N/A'}`, {
-    x: margin,
-    y: height - margin - lineHeight * lineCount,
-    size: fontSize,
-    font,
-    color: rgb(0, 0, 0),
-  });
-  
-  // Convert the PDF to bytes
-  const pdfBytes = await pdfDoc.save();
-  
-  return Buffer.from(pdfBytes);
 }
 

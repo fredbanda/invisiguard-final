@@ -1,15 +1,13 @@
 "use client"
 
-import { CardFooter } from "@/components/ui/card"
-
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { ChevronDown, CreditCard, Globe, Home, Info, MapPin, User } from "lucide-react"
+import { ChevronDown, CreditCard, Download, FileText, Globe, Home, Info, MapPin, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -18,7 +16,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { InsightsPanel } from "@/components/insights-panel"
-import { CountrySelector } from "./country-selector"
+import { saveTransactionWithReport } from "@/actions/save-transactions"
+import { toast } from "sonner"
 import Link from "next/link"
 
 const formSchema = z.object({
@@ -73,17 +72,61 @@ export default function MinFraudForm() {
     fraudScore: number
     ipRiskScore: number
     recommendations: string[]
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     warnings?: any[]
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     insights?: any
   }>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSavingReport, setIsSavingReport] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      // Transaction
+      shopId: "",
+      transactionId: "",
+      transactionAmount: "",
       transactionCurrency: "USD",
       transactionType: "sale",
+
+      // Credit Card
+      cardBin: "",
+      cardLast4: "",
+      avsResult: "",
+      cvvResult: "",
+
+      // Account
+      userEmail: "",
+      username: "",
+      accountCreatedAt: "",
+
+      // Billing
+      billingFirstName: "",
+      billingLastName: "",
+      billingAddress1: "",
+      billingAddress2: "",
+      billingCity: "",
+      billingRegion: "",
+      billingPostal: "",
+      billingCountry: "",
+      billingPhone: "",
+
+      // Shipping
+      shippingFirstName: "",
+      shippingLastName: "",
+      shippingAddress1: "",
+      shippingAddress2: "",
+      shippingCity: "",
+      shippingRegion: "",
+      shippingPostal: "",
+      shippingCountry: "",
+
+      // Device
+      ipAddress: "",
+      userAgent: "",
+      sessionId: "",
     },
   })
 
@@ -108,7 +151,10 @@ export default function MinFraudForm() {
         values.userAgent = window.navigator.userAgent
       }
 
-      const response = await fetch("/api/minfraud", {
+      // For testing with mock data
+      const response = await fetch("/api/minfraud-mock", {
+        // For production with real MaxMind API
+        // const response = await fetch("/api/minfraud", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -136,12 +182,85 @@ export default function MinFraudForm() {
     }
   }
 
+  async function handleGenerateReport() {
+    if (!result) return
+
+    try {
+      setIsSavingReport(true)
+
+      // Save transaction and generate report
+      const saveResult = await saveTransactionWithReport(form.getValues(), result)
+
+      if (saveResult.success) {
+        toast.success("The report has been saved to the database.",{
+          position: "top-right",
+        })
+      } else {
+        console.error("Error details:", saveResult.error)
+        toast("Failed to generate report",{
+          position: "top-right",
+        })
+      }
+    } catch (err) {
+      console.error("Error generating report:", err)
+      toast("An unexpected error occurred while generating the report.",{
+        position: "top-right",
+      })
+    } finally {
+      setIsSavingReport(false)
+    }
+  }
+
+  async function handleDownloadPdf() {
+    if (!result) return
+
+    try {
+      // Generate PDF client-side for download
+      const { generateMinFraudReport } = await import("@/utils/pdf-generator")
+      const pdfBytes = await generateMinFraudReport(result, form.getValues())
+
+      // Create a blob from the PDF bytes
+      const blob = new Blob([pdfBytes], { type: "application/pdf" })
+      const url = URL.createObjectURL(blob)
+
+      // Create a link and trigger download
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `minfraud-report-${form.getValues().transactionId || "unknown"}.pdf`
+      document.body.appendChild(link)
+      link.click()
+
+      // Clean up
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error("Error downloading PDF:", err)
+      toast("Failed to download the PDF report.",{
+        position: "top-right",
+      })
+    }
+  }
+
+  async function testApi() {
+    try {
+      const response = await fetch("/api/test")
+      const data = await response.json()
+      console.log("Test API response:", data)
+      // biome-ignore lint/style/useTemplate: <explanation>
+      alert("API test successful: " + JSON.stringify(data))
+    } catch (err) {
+      console.error("Test API error:", err)
+      // biome-ignore lint/style/useTemplate: <explanation>
+      alert("API test failed: " + (err as Error).message)
+    }
+  }
+
   return (
     <div className="container mx-auto py-6 w-[800px]">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-4xl font-bold text-white/80 text-center">minFraud Interactive</h1>
-          <p className="text-white/80 text-md text-center">
+          <h1 className="text-3xl font-bold text-white/80 text-center">minFraud Interactive</h1>
+          <p className="text-white text-center">
             Submit transaction data to evaluate fraud risk using MaxMind's minFraud service
           </p>
         </div>
@@ -212,7 +331,11 @@ export default function MinFraudForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                <CountrySelector />
+                                  <SelectItem value="USD">USD</SelectItem>
+                                  <SelectItem value="EUR">EUR</SelectItem>
+                                  <SelectItem value="GBP">GBP</SelectItem>
+                                  <SelectItem value="CAD">CAD</SelectItem>
+                                  <SelectItem value="AUD">AUD</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -499,7 +622,12 @@ export default function MinFraudForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                <CountrySelector />
+                                  <SelectItem value="US">United States</SelectItem>
+                                  <SelectItem value="CA">Canada</SelectItem>
+                                  <SelectItem value="GB">United Kingdom</SelectItem>
+                                  <SelectItem value="AU">Australia</SelectItem>
+                                  <SelectItem value="DE">Germany</SelectItem>
+                                  <SelectItem value="FR">France</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -636,7 +764,12 @@ export default function MinFraudForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                <CountrySelector />
+                                  <SelectItem value="US">United States</SelectItem>
+                                  <SelectItem value="CA">Canada</SelectItem>
+                                  <SelectItem value="GB">United Kingdom</SelectItem>
+                                  <SelectItem value="AU">Australia</SelectItem>
+                                  <SelectItem value="DE">Germany</SelectItem>
+                                  <SelectItem value="FR">France</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -710,8 +843,8 @@ export default function MinFraudForm() {
                   </AccordionItem>
                 </Accordion>
 
-                <div className="flex justify-end">
-                  <Button type="submit" size="lg" disabled={isSubmitting}>
+                <div className="flex justify-end gap-2">
+                  <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
                     {isSubmitting ? "Analyzing..." : "Submit for Analysis"}
                   </Button>
                 </div>
@@ -740,7 +873,7 @@ export default function MinFraudForm() {
                         <span className="text-sm font-bold">{result.riskScore.toFixed(1)}</span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2.5">
-                        <div className="bg-primary h-2.5 rounded-full" style={{ width: `${result.riskScore}%` }}></div>
+                        <div className="bg-primary h-2.5 rounded-full" style={{ width: `${result.riskScore}%` }} />
                       </div>
                     </div>
 
@@ -759,7 +892,7 @@ export default function MinFraudForm() {
                                 : "bg-success"
                           }`}
                           style={{ width: `${result.fraudScore}%` }}
-                        ></div>
+                        />
                       </div>
                     </div>
 
@@ -772,7 +905,7 @@ export default function MinFraudForm() {
                         <div
                           className="bg-primary h-2.5 rounded-full"
                           style={{ width: `${result.ipRiskScore}%` }}
-                        ></div>
+                        />
                       </div>
                     </div>
 
@@ -782,7 +915,8 @@ export default function MinFraudForm() {
                       <h3 className="font-medium mb-2">Recommendations</h3>
                       <ul className="space-y-1">
                         {result.recommendations.map((rec, i) => (
-                          <li key={i} className="text-sm flex items-start gap-2">
+                          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+<li key={i} className="text-sm flex items-start gap-2">
                             <span className="bg-primary/10 text-primary rounded-full p-1 mt-0.5">
                               <ChevronDown className="h-3 w-3" />
                             </span>
@@ -791,10 +925,24 @@ export default function MinFraudForm() {
                         ))}
                       </ul>
                     </div>
+
                     {result?.insights && Object.keys(result.insights).length > 0 && (
                       <InsightsPanel insights={result.insights} />
                     )}
+
                     <Separator />
+
+                    <div className="flex flex-col gap-2">
+                      <Button onClick={handleGenerateReport} disabled={isSavingReport} className="w-full">
+                        <FileText className="mr-2 h-4 w-4" />
+                        {isSavingReport ? "Saving..." : "Save Report to Database"}
+                      </Button>
+
+                      <Button onClick={handleDownloadPdf} variant="outline" className="w-full">
+                        <Download className="mr-2 h-4 w-4" />
+                        Download PDF Report
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
@@ -808,13 +956,17 @@ export default function MinFraudForm() {
                   <Info className="h-4 w-4" />
                   <AlertTitle>Information</AlertTitle>
                   <AlertDescription>
-                    This is a demonstration form. In a real implementation, this would connect to MaxMind's minFraud
-                    API.
+                    This form connects to MaxMind's minFraud API for real-time fraud detection.
                   </AlertDescription>
                 </Alert>
               </CardFooter>
               <Link href="/dashboard/minmax-results">
-                <Button variant="default" className="w-full bg-black text-white">Go To Dashboard</Button>
+                <Button
+                  variant="default"
+                  className="w-full bg-black text-white"
+                >
+                  Go To Dashboard
+                </Button>
               </Link>
             </Card>
           </div>

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import crypto from "crypto"
+import crypto from "node:crypto"
 
 // MaxMind API endpoints
 const MINFRAUD_SCORE_URL = "https://minfraud.maxmind.com/minfraud/v2.0/score"
@@ -21,7 +21,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Get form data from request
-    const formData = await request.json()
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+        let formData;
+    try {
+      formData = await request.json()
+    } catch (error) {
+      console.error("Error parsing request JSON:", error)
+      return NextResponse.json({ error: "Invalid JSON in request body" }, { status: 400 })
+    }
 
     // Transform form data to MaxMind API format
     const minfraudData = transformFormDataToMinFraudFormat(formData)
@@ -30,33 +37,70 @@ export async function POST(request: NextRequest) {
     const endpoint = formData.useInsights ? MINFRAUD_INSIGHTS_URL : MINFRAUD_SCORE_URL
 
     // Make request to MaxMind API
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${accountId}:${licenseKey}`).toString("base64")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(minfraudData),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("MaxMind API error:", errorText)
-      return NextResponse.json({ error: "Error from MaxMind API", details: errorText }, { status: response.status })
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+        let response;
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${accountId}:${licenseKey}`).toString("base64")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(minfraudData),
+      })
+      console.log(response)
+      
+    } catch (error) {
+      console.error("Error fetching from MaxMind API:", error)
+      return NextResponse.json({ 
+        error: "Failed to connect to MaxMind API", 
+        details: (error as Error).message 
+      }, { status: 500 })
     }
 
-    const data = await response.json()
+    if (!response.ok) {
+      // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+      let errorText;
+      try {
+        errorText = await response.text()
+      } catch (e) {
+        errorText = "Could not read error response"
+      }
+      console.error("MaxMind API error:", errorText)
+      return NextResponse.json({ 
+        error: "Error from MaxMind API", 
+        details: errorText,
+        status: response.status
+      }, { status: response.status })
+    }
+
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+    let data;
+    try {
+      data = await response.json()
+    } catch (error) {
+      console.error("Error parsing MaxMind API response:", error)
+      return NextResponse.json({ 
+        error: "Invalid JSON in MaxMind API response", 
+        details: (error as Error).message 
+      }, { status: 500 })
+    }
 
     // Process and return the response
     return NextResponse.json(processMinFraudResponse(data))
   } catch (error) {
     console.error("Error in minfraud API route:", error)
-    return NextResponse.json({ error: "Internal server error", details: (error as Error).message }, { status: 500 })
+    return NextResponse.json({ 
+      error: "Internal server error", 
+      details: (error as Error).message 
+    }, { status: 500 })
   }
 }
 
 // Transform form data to the format expected by MaxMind's API
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function transformFormDataToMinFraudFormat(formData: any) {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const result: any = {
     device: {},
     event: {},
@@ -178,7 +222,8 @@ function transformFormDataToMinFraudFormat(formData: any) {
   }
 
   // Remove empty objects
-  Object.keys(result).forEach((key) => {
+  // biome-ignore lint/complexity/noForEach: <explanation>
+    Object.keys(result).forEach((key) => {
     if (Object.keys(result[key]).length === 0) {
       delete result[key]
     }
@@ -188,6 +233,7 @@ function transformFormDataToMinFraudFormat(formData: any) {
 }
 
 // Process the response from MaxMind
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function processMinFraudResponse(data: any) {
   const result = {
     riskScore: data.risk_score || 0,
@@ -246,4 +292,3 @@ function processMinFraudResponse(data: any) {
 
   return result
 }
-

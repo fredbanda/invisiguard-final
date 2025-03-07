@@ -3,11 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 
-<<<<<<< HEAD
-export async function GET(req: Request, { params }: { params: Promise< { id: string }> }) {
-=======
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
->>>>>>> 85440dc274a0fa7a5846d6e64c96d9ac664279b7
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
@@ -17,13 +13,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     const report = await db.scan.findUnique({
-<<<<<<< HEAD
-      where: { id: (await params).id, userId: session.user.id },
-      select: { pdfData: true }, // Ensure this field exists
-=======
       where: { id, userId: session.user.id },
-      select: { pdfData: true },
->>>>>>> 85440dc274a0fa7a5846d6e64c96d9ac664279b7
+      select: { pdfData: true }, // Ensure this field exists
     });
 
     if (!report || !report.pdfData) {
@@ -34,13 +25,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-<<<<<<< HEAD
-        "Content-Disposition": `attachment; filename="report-${(await params).id}.pdf"`,
-=======
-        "Content-Disposition": `attachment; filename="report-${id}.pdf"`,
->>>>>>> 85440dc274a0fa7a5846d6e64c96d9ac664279b7
+        "Content-Disposition": `attachment; filename="report-${id}.pdf"`, // Keeping the correct version
       },
     });
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   } catch (error: any) {
     console.error("Error fetching report:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {

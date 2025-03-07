@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 
 interface InsightsPanelProps {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   insights: any
 }
 
@@ -47,4 +48,5 @@ export function InsightsPanel({ insights }: InsightsPanelProps) {
     </Card>
   )
 }
+
 
