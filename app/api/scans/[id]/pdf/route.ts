@@ -5,11 +5,7 @@ import { db } from '@/lib/db';
 
 export async function GET(
   req: NextRequest,
-<<<<<<< HEAD
-  { params }: { params: Promise < { id: string }> }
-=======
-  { params }: { params: Promise< { id: string }> }
->>>>>>> 85440dc274a0fa7a5846d6e64c96d9ac664279b7
+  { params }: { params: Promise<{ id: string }> } // Merged both versions
 ) {
   try {
     const scan = await db.scan.findUnique({
