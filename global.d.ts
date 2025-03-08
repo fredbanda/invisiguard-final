@@ -13,7 +13,22 @@ declare global {
     const targetUrl: GlobalData['targetUrl'];
     const status: GlobalData['status'];
  
-  
+    interface MaxMindResponse {
+      risk_score?: number;
+      fraud_score?: number;
+      ip_address?: {
+        risk?: number;
+        country?: { names?: { en?: string } };
+        city?: { names?: { en?: string } };
+        traits?: { isp?: string };
+      };
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      warnings?: any[]; // If you have a structure for warnings, replace `any[]` with the correct type
+      email?: { is_free?: boolean };
+      billing_address?: { is_postal_in_city?: boolean };
+      shipping_address?: { distance_to_billing_address?: number };
+    }
+    
   
   
   interface Form {

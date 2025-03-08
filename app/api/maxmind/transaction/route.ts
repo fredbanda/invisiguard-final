@@ -1,14 +1,24 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import { URL } from 'node:url';
 import * as minFraud from '@maxmind/minfraud-api-node';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { generatePdfForTransaction } from '@/lib/pdf-generator';
+import { generateMinFraudReport } from '@/lib/pdf-generator';
+
+interface ShoppingCartItemData {
+  category: string;
+  itemId: string;
+  price: number;
+  quantity: number;
+}
+
 
 const prisma = new PrismaClient();
 
 // This should be in an environment variable
-const MAXMIND_ACCOUNT_ID = process.env.MAXMIND_ACCOUNT_ID || "1234";
-const MAXMIND_LICENSE_KEY = process.env.MAXMIND_LICENSE_KEY || "LICENSEKEY";
+const MAXMIND_ACCOUNT_ID = process.env.MAXMIND_ACCOUNT_ID || "1128519";
+const MAXMIND_LICENSE_KEY = process.env.MAXMIND_LICENSE_KEY || "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";
 
 // Create reusable client
 const client = new minFraud.Client(MAXMIND_ACCOUNT_ID, MAXMIND_LICENSE_KEY);
@@ -92,7 +102,7 @@ export async function POST(request: Request) {
         referrerUri: transactionData.orderReferrerUri ? new URL(transactionData.orderReferrerUri) : undefined,
         subaffiliateId: transactionData.orderSubaffiliateId,
       }),
-      shoppingCart: transactionData.shoppingCartItems?.map(item => 
+      shoppingCart: transactionData.shoppingCartItems?.map((item: ShoppingCartItemData )=> 
         new minFraud.ShoppingCartItem({
           category: item.category,
           itemId: item.itemId,
@@ -100,10 +110,13 @@ export async function POST(request: Request) {
           quantity: item.quantity,
         })
       ) || [],
+
     });
 
     // Get risk score from MaxMind
     const response = await client.score(transaction);
+    console.log(response);
+    
     
     // Create a new database record with the transaction data and the risk score
     const dbTransaction = await prisma.maxMindTransaction.create({
@@ -162,9 +175,9 @@ export async function POST(request: Request) {
         orderReferrerUri: transactionData.orderReferrerUri,
         orderSubaffiliateId: transactionData.orderSubaffiliateId,
         riskScore: response.riskScore,
-        ipAddressRisk: response.ipAddress?.risk,
+        ipAddressRisk: response.ipAddress?.risk || 0,
         shoppingCartItems: {
-          create: transactionData.shoppingCartItems?.map(item => ({
+          create: transactionData.shoppingCartItems?.map((item:  ShoppingCartItemData)=> ({
             category: item.category,
             itemId: item.itemId,
             price: item.price,
@@ -175,7 +188,9 @@ export async function POST(request: Request) {
     });
 
     // Generate PDF report and update the record with the PDF data
-    const pdfBytes = await generatePdfForTransaction(dbTransaction);
+    const pdfBytes = await generateMinFraudReport(dbTransaction, dbTransaction.id);
+    console.log(pdfBytes);
+    
     
     await prisma.maxMindTransaction.update({
       where: { id: dbTransaction.id },
@@ -186,7 +201,7 @@ export async function POST(request: Request) {
       success: true, 
       transactionId: dbTransaction.id,
       riskScore: response.riskScore,
-      ipAddressRisk: response.ipAddress.risk
+      ipAddressRisk: response.ipAddress?.risk || 0
     });
   } catch (error) {
     console.error('Error processing transaction:', error);

@@ -59,7 +59,7 @@ export const CountrySelector = () => {
       <SelectItem value="CD">Congo, The Democratic Republic Of The</SelectItem>
       <SelectItem value="CK">Cook Islands</SelectItem>
       <SelectItem value="CR">Costa Rica</SelectItem>
-      <SelectItem value="CI">Côte D'Ivoire</SelectItem>
+      <SelectItem value="CI">Côte D&apos;Ivoire</SelectItem>
       <SelectItem value="HR">Croatia</SelectItem>
       <SelectItem value="CU">Cuba</SelectItem>
       <SelectItem value="CW">Curaçao</SelectItem>
@@ -122,7 +122,7 @@ export const CountrySelector = () => {
       <SelectItem value="KZ">Kazakhstan</SelectItem>
       <SelectItem value="KE">Kenya</SelectItem>
       <SelectItem value="KI">Kiribati</SelectItem>
-      <SelectItem value="KP">Korea, Democratic People's Republic Of</SelectItem>
+      <SelectItem value="KP">Korea, Democratic People&apos;s Republic Of</SelectItem>
       <SelectItem value="KR">Korea, Republic of</SelectItem>
       <SelectItem value="XK">Kosovo</SelectItem>
       <SelectItem value="KW">Kuwait</SelectItem>

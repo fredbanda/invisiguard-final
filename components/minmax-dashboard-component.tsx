@@ -43,7 +43,7 @@ export default function TransactionsList() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     fetchTransactions();
-  }, [pagination.page]);
+  }, [pagination.page, pagination.pageSize]);
 
   const fetchTransactions = async () => {
     try {
@@ -66,7 +66,7 @@ export default function TransactionsList() {
         queryParams.append('userId', filters.userId);
       }
       
-      const response = await fetch(`/api/maxmind/reports?${queryParams.toString()}`);
+      const response = await fetch(`/api/maxmind/transaction?${queryParams.toString()}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch transactions');
@@ -96,11 +96,11 @@ export default function TransactionsList() {
     fetchTransactions();
   };
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage > 0 && newPage <= pagination.totalPages) {
-      setPagination(prev => ({ ...prev, page: newPage }));
-    }
-  };
+  // const handlePageChange = (newPage: number) => {
+  //   if (newPage > 0 && newPage <= pagination.totalPages) {
+  //     setPagination(prev => ({ ...prev, page: newPage }));
+  //   }
+  // };
 
   // Format date for display
   const formatDate = (dateString: string) => {

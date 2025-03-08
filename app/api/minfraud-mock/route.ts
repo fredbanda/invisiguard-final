@@ -1,10 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server"
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 
-export async function POST(request: NextRequest) {
+import { NextResponse } from "next/server"
+
+export async function POST() {
   try {
-    // Get form data from request
-    const formData = await request.json()
-
+    
     // Create a mock response
     const mockResponse = {
       risk_score: Math.random() * 100,

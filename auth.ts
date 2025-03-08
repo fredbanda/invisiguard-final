@@ -149,7 +149,7 @@ export const {
          if (fingerprintData) {
            token.fingerprint = {
             visitorId: fingerprintData.visitorId,
-            ip: fingerprintData.ip,
+            ip: fingerprintData.ips,
              country: fingerprintData.country,
              city: fingerprintData.city,
             isp: fingerprintData.isp,

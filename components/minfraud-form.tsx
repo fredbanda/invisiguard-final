@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -152,9 +153,9 @@ export default function MinFraudForm() {
       }
 
       // For testing with mock data
-      const response = await fetch("/api/minfraud-mock", {
+      //const response = await fetch("/api/minfraud-mock", {
         // For production with real MaxMind API
-        // const response = await fetch("/api/minfraud", {
+      const response = await fetch("/api/maxmind", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -216,7 +217,7 @@ export default function MinFraudForm() {
 
     try {
       // Generate PDF client-side for download
-      const { generateMinFraudReport } = await import("@/utils/pdf-generator")
+      const { generateMinFraudReport } = await import("@/lib/pdf-generator")
       const pdfBytes = await generateMinFraudReport(result, form.getValues())
 
       // Create a blob from the PDF bytes
@@ -241,27 +242,27 @@ export default function MinFraudForm() {
     }
   }
 
-  async function testApi() {
-    try {
-      const response = await fetch("/api/test")
-      const data = await response.json()
-      console.log("Test API response:", data)
-      // biome-ignore lint/style/useTemplate: <explanation>
-      alert("API test successful: " + JSON.stringify(data))
-    } catch (err) {
-      console.error("Test API error:", err)
-      // biome-ignore lint/style/useTemplate: <explanation>
-      alert("API test failed: " + (err as Error).message)
-    }
-  }
+  // async function testApi() {
+  //   try {
+  //     const response = await fetch("/api/test")
+  //     const data = await response.json()
+  //     console.log("Test API response:", data)
+  //     // biome-ignore lint/style/useTemplate: <explanation>
+  //     alert("API test successful: " + JSON.stringify(data))
+  //   } catch (err) {
+  //     console.error("Test API error:", err)
+  //     // biome-ignore lint/style/useTemplate: <explanation>
+  //     alert("API test failed: " + (err as Error).message)
+  //   }
+  // }
 
   return (
     <div className="container mx-auto py-6 w-[800px]">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold text-white/80 text-center">minFraud Interactive</h1>
+          <h1 className="text-3xl font-bold text-white/80 text-center">Invisiguard Fraud Interactive Widget</h1>
           <p className="text-white text-center">
-            Submit transaction data to evaluate fraud risk using MaxMind's minFraud service
+            Submit transaction data to evaluate fraud risk using Invisiguard&apos;s Fraud service
           </p>
         </div>
 
@@ -336,6 +337,7 @@ export default function MinFraudForm() {
                                   <SelectItem value="GBP">GBP</SelectItem>
                                   <SelectItem value="CAD">CAD</SelectItem>
                                   <SelectItem value="AUD">AUD</SelectItem>
+                                  <SelectItem value="ZAR">ZAR</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -870,7 +872,7 @@ export default function MinFraudForm() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Risk Score</span>
-                        <span className="text-sm font-bold">{result.riskScore.toFixed(1)}</span>
+                        <span className="text-sm font-bold">{result.riskScore}</span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2.5">
                         <div className="bg-primary h-2.5 rounded-full" style={{ width: `${result.riskScore}%` }} />
@@ -880,7 +882,7 @@ export default function MinFraudForm() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Fraud Score</span>
-                        <span className="text-sm font-bold">{result.fraudScore.toFixed(1)}</span>
+                        <span className="text-sm font-bold">{result.fraudScore}</span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2.5">
                         <div
@@ -899,7 +901,7 @@ export default function MinFraudForm() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">IP Risk Score</span>
-                        <span className="text-sm font-bold">{result.ipRiskScore.toFixed(1)}</span>
+                        <span className="text-sm font-bold">{result.ipRiskScore}</span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2.5">
                         <div
@@ -956,7 +958,7 @@ export default function MinFraudForm() {
                   <Info className="h-4 w-4" />
                   <AlertTitle>Information</AlertTitle>
                   <AlertDescription>
-                    This form connects to MaxMind's minFraud API for real-time fraud detection.
+                    This form connects to MaxMind&apos;s minFraud API for real-time fraud detection.
                   </AlertDescription>
                 </Alert>
               </CardFooter>

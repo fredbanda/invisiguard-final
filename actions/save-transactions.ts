@@ -1,7 +1,8 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { generateMinFraudReport } from "@/utils/pdf-generator"
+import { generateMinFraudReport } from "@/lib/pdf-generator"
+
 
 // Simplified version without authentication for testing
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>

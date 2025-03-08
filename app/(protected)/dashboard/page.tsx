@@ -1,6 +1,5 @@
 "use client";
 
-import TransactionsList from "@/components/minmax-dashboard-component";
 import { useEffect, useState } from "react";
 
 interface Report {

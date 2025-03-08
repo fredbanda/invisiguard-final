@@ -53,7 +53,7 @@ export default function MinMaxDashboardComponent() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: We only want to refetch when timeframe changes
   useEffect(() => {
     fetchDashboardData();
-  }, [timeframe]);
+  }, [timeframe, setDashboardData]);
 
   const fetchDashboardData = async () => {
     try {
