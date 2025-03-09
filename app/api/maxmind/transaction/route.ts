@@ -7,8 +7,8 @@ import { generatePdfForTransaction } from '@/lib/pdf-generator';
 const prisma = new PrismaClient();
 
 // This should be in an environment variable
-const MAXMIND_ACCOUNT_ID = process.env.MAXMIND_ACCOUNT_ID || "1234";
-const MAXMIND_LICENSE_KEY = process.env.MAXMIND_LICENSE_KEY || "LICENSEKEY";
+const accountId = process.env.MINFRAUD_ACCOUNT_ID || process.env.MAXMIND_ACCOUNT_ID || "";
+const licenseKey = process.env.MINFRAUD_LICENSE_KEY || process.env.MAXMIND_LICENSE_KEY || "";
 
 // Create reusable client
 const client = new minFraud.Client(MAXMIND_ACCOUNT_ID, MAXMIND_LICENSE_KEY);
