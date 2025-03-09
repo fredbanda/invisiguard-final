@@ -1,3 +1,6 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client";
 
 // biome-ignore lint/style/useImportType: <explanation>
@@ -96,11 +99,11 @@ export default function TransactionsList() {
     fetchTransactions();
   };
 
-  // const handlePageChange = (newPage: number) => {
-  //   if (newPage > 0 && newPage <= pagination.totalPages) {
-  //     setPagination(prev => ({ ...prev, page: newPage }));
-  //   }
-  // };
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= pagination.totalPages) {
+      setPagination(prev => ({ ...prev, page: newPage }));
+    }
+  };
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -261,7 +264,7 @@ export default function TransactionsList() {
                                 : 'bg-green-100 text-green-800'
                           }`}
                         >
-                          {transaction.riskScore.toFixed(1)}
+                          {transaction.riskScore}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

@@ -1,20 +1,18 @@
-import type { ScoreRequest } from "@maxmind/minfraud-sdk"
-import { MinFraudClient } from "@maxmind/minfraud-sdk"
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 
-const client = new MinFraudClient({
-  accountId: process.env.MINFRAUD_ACCOUNT_ID!,
-  licenseKey: process.env.MINFRAUD_LICENSE_KEY!,
-})
+import { Client as MinFraudClient } from "@maxmind/minfraud-api-node";
+
+const client = new MinFraudClient(process.env.MINFRAUD_ACCOUNT_ID!, process.env.MINFRAUD_LICENSE_KEY!);
 
 export const minFraud = {
-  async score(request: ScoreRequest) {
+  async score(request: any) { // Change this if you know the expected structure
     try {
-      const response = await client.score(request)
-      return response.data
+      const response = await client.score(request);
+      console.log("minFraud response:", response);
+      return response
     } catch (error) {
-      console.error("Error calling minFraud API:", error)
-      throw error
+      console.error("Error calling minFraud API:", error);
+      throw error;
     }
   },
-}
-
+};

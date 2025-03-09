@@ -66,8 +66,8 @@ export default function FingerprintDashboard() {
                   <td className="p-2 border">{fp.browser || 'Unknown'}</td>
                   <td className="p-2 border">{fp.os || 'Unknown'}</td>
                   <td className="p-2 border">{fp.device || 'Unknown'}</td>
-                  <td className="p-2 border">{(fp.confidenceScore * 100).toFixed(1)}%</td>
-                  <td className="p-2 border">{(fp.botProbability * 100).toFixed(1)}%</td>
+                  <td className="p-2 border">{(fp.confidenceScore * 100).toFixed()}%</td>
+                  <td className="p-2 border">{(fp.botProbability * 100).toFixed()}%</td>
                   <td className="p-2 border">{fp.vpnDetected ? 'Yes' : 'No'}</td>
                   <td className="p-2 border">{new Date(fp.createdAt).toLocaleString()}</td>
                 </tr>

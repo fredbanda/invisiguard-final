@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE "scan" ADD COLUMN     "ips" TEXT[];
+-- ALTER TABLE "scan" ADD COLUMN     "ips" TEXT[];
 
 -- CreateTable
 CREATE TABLE "pdf_data" (

@@ -6,7 +6,9 @@ export async function GET() {
   try {
     const session = await auth();
     if (!session?.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
     const userId = session.user.id;
@@ -27,10 +29,10 @@ export async function GET() {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   } catch (error: any) {
-    console.error("Error fetching reports:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Error fetching reports:", error);
+    return new Response(JSON.stringify({ error: error }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

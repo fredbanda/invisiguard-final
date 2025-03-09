@@ -1,140 +1,68 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
-import { URL } from 'node:url';
+import { PrismaClient } from '@prisma/client';
 import * as minFraud from '@maxmind/minfraud-api-node';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { generateMinFraudReport } from '@/lib/pdf-generator';
-
-interface ShoppingCartItemData {
-  category: string;
-  itemId: string;
-  price: number;
-  quantity: number;
-}
+import { db } from '@/lib/db';
 
 
 const prisma = new PrismaClient();
-
-// This should be in an environment variable
-const MAXMIND_ACCOUNT_ID = process.env.MAXMIND_ACCOUNT_ID || "1128519";
-const MAXMIND_LICENSE_KEY = process.env.MAXMIND_LICENSE_KEY || "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";
-
-// Create reusable client
-const client = new minFraud.Client(MAXMIND_ACCOUNT_ID, MAXMIND_LICENSE_KEY);
+const accountId = process.env.MINFRAUD_ACCOUNT_ID || process.env.MAXMIND_ACCOUNT_ID || "";
+const licenseKey = process.env.MINFRAUD_LICENSE_KEY || process.env.MAXMIND_LICENSE_KEY || "";
+const client = new minFraud.Client(accountId, licenseKey);
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
     const { userId, ...transactionData } = data;
-    
-    // Create a new MinFraud transaction object
+
+    // Create MinFraud transaction object
     const transaction = new minFraud.Transaction({
       device: new minFraud.Device({
         ipAddress: transactionData.deviceIpAddress,
-        acceptLanguage: transactionData.deviceAcceptLanguage,
-        sessionAge: transactionData.deviceSessionAge,
-        sessionId: transactionData.deviceSessionId,
-        userAgent: transactionData.deviceUserAgent,
       }),
       event: new minFraud.Event({
-        shopId: transactionData.eventShopId,
-        time: new Date(transactionData.eventTime),
         transactionId: transactionData.eventTransactionId,
         type: transactionData.eventType,
       }),
       account: new minFraud.Account({
         userId: transactionData.accountUserId,
-        username: transactionData.accountUsername,
       }),
-      email: new minFraud.Email({
-        address: transactionData.emailAddress,
-        domain: transactionData.emailDomain,
-      }),
-      billing: new minFraud.Billing({
-        address: transactionData.billingAddress,
-        address2: transactionData.billingAddress2,
-        city: transactionData.billingCity,
-        company: transactionData.billingCompany,
-        country: transactionData.billingCountry,
-        firstName: transactionData.billingFirstName,
-        lastName: transactionData.billingLastName,
-        phoneCountryCode: transactionData.billingPhoneCountryCode,
-        phoneNumber: transactionData.billingPhoneNumber,
-        postal: transactionData.billingPostal,
-        region: transactionData.billingRegion,
-      }),
-      shipping: new minFraud.Shipping({
-        address: transactionData.shippingAddress,
-        address2: transactionData.shippingAddress2,
-        city: transactionData.shippingCity,
-        company: transactionData.shippingCompany,
-        country: transactionData.shippingCountry,
-        firstName: transactionData.shippingFirstName,
-        lastName: transactionData.shippingLastName,
-        phoneCountryCode: transactionData.shippingPhoneCountryCode,
-        phoneNumber: transactionData.shippingPhoneNumber,
-        postal: transactionData.shippingPostal,
-        region: transactionData.shippingRegion,
-      }),
-      payment: new minFraud.Payment({
-        declineCode: transactionData.paymentDeclineCode,
-        processor: transactionData.paymentProcessor,
-        wasAuthorized: transactionData.paymentWasAuthorized,
-      }),
-      creditCard: new minFraud.CreditCard({
-        avsResult: transactionData.creditCardAvsResult,
-        bankName: transactionData.creditCardBankName,
-        bankPhoneCountryCode: transactionData.creditCardBankPhoneCountryCode,
-        bankPhoneNumber: transactionData.creditCardBankPhoneNumber,
-        cvvResult: transactionData.creditCardCvvResult,
-        issuerIdNumber: transactionData.creditCardIssuerIdNumber,
-        last4digits: transactionData.creditCardLastDigits,
-        token: transactionData.creditCardToken,
-      }),
-      order: new minFraud.Order({
-        affiliateId: transactionData.orderAffiliateId,
-        amount: transactionData.orderAmount,
-        currency: transactionData.orderCurrency,
-        discountCode: transactionData.orderDiscountCode,
-        hasGiftMessage: transactionData.orderHasGiftMessage,
-        isGift: transactionData.orderIsGift,
-        referrerUri: transactionData.orderReferrerUri ? new URL(transactionData.orderReferrerUri) : undefined,
-        subaffiliateId: transactionData.orderSubaffiliateId,
-      }),
-      shoppingCart: transactionData.shoppingCartItems?.map((item: ShoppingCartItemData )=> 
-        new minFraud.ShoppingCartItem({
-          category: item.category,
-          itemId: item.itemId,
-          price: item.price,
-          quantity: item.quantity,
-        })
-      ) || [],
-
     });
 
     // Get risk score from MaxMind
     const response = await client.score(transaction);
-    console.log(response);
-    
-    
-    // Create a new database record with the transaction data and the risk score
-    const dbTransaction = await prisma.maxMindTransaction.create({
+
+    // Save transaction to database
+    const dbTransaction = await db.maxMindTransaction.create({
       data: {
         userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    
+        // ✅ Device Information
         deviceIpAddress: transactionData.deviceIpAddress,
+    
+        // ✅ Event Details
         eventShopId: transactionData.eventShopId,
         eventTime: new Date(transactionData.eventTime),
         eventTransactionId: transactionData.eventTransactionId,
         eventType: transactionData.eventType,
+    
+        // ✅ Account Information
         accountUserId: transactionData.accountUserId,
         accountUsername: transactionData.accountUsername,
+    
+        // ✅ Email Details
         emailAddress: transactionData.emailAddress,
         emailDomain: transactionData.emailDomain,
+    
+        // ✅ Billing Information
         billingAddress: transactionData.billingAddress,
-        billingAddress2: transactionData.billingAddress2,
+        billingAddress2: transactionData.billingAddress2 || null,
         billingCity: transactionData.billingCity,
-        billingCompany: transactionData.billingCompany,
+        billingCompany: transactionData.billingCompany || null,
         billingCountry: transactionData.billingCountry,
         billingFirstName: transactionData.billingFirstName,
         billingLastName: transactionData.billingLastName,
@@ -142,10 +70,12 @@ export async function POST(request: Request) {
         billingPhoneNumber: transactionData.billingPhoneNumber,
         billingPostal: transactionData.billingPostal,
         billingRegion: transactionData.billingRegion,
+    
+        // ✅ Shipping Information
         shippingAddress: transactionData.shippingAddress,
-        shippingAddress2: transactionData.shippingAddress2,
+        shippingAddress2: transactionData.shippingAddress2 || null,
         shippingCity: transactionData.shippingCity,
-        shippingCompany: transactionData.shippingCompany,
+        shippingCompany: transactionData.shippingCompany || null,
         shippingCountry: transactionData.shippingCountry,
         shippingDeliverySpeed: transactionData.shippingDeliverySpeed,
         shippingFirstName: transactionData.shippingFirstName,
@@ -154,30 +84,40 @@ export async function POST(request: Request) {
         shippingPhoneNumber: transactionData.shippingPhoneNumber,
         shippingPostal: transactionData.shippingPostal,
         shippingRegion: transactionData.shippingRegion,
-        paymentDeclineCode: transactionData.paymentDeclineCode,
+    
+        // ✅ Payment Details
+        paymentDeclineCode: transactionData.paymentDeclineCode || null,
         paymentProcessor: transactionData.paymentProcessor,
         paymentWasAuthorized: transactionData.paymentWasAuthorized,
+    
+        // ✅ Credit Card Information
         creditCardAvsResult: transactionData.creditCardAvsResult,
-        creditCardBankName: transactionData.creditCardBankName,
-        creditCardBankPhoneCountryCode: transactionData.creditCardBankPhoneCountryCode,
-        creditCardBankPhoneNumber: transactionData.creditCardBankPhoneNumber,
+        creditCardBankName: transactionData.creditCardBankName || null,
+        creditCardBankPhoneCountryCode: transactionData.creditCardBankPhoneCountryCode || null,
+        creditCardBankPhoneNumber: transactionData.creditCardBankPhoneNumber || null,
         creditCardCvvResult: transactionData.creditCardCvvResult,
         creditCardIssuerIdNumber: transactionData.creditCardIssuerIdNumber,
         creditCardLastDigits: transactionData.creditCardLastDigits,
-        creditCardToken: transactionData.creditCardToken,
+        creditCardToken: transactionData.creditCardToken || null,
         creditCardWas3DSecureSuccessful: transactionData.creditCardWas3DSecureSuccessful || false,
-        orderAffiliateId: transactionData.orderAffiliateId,
+    
+        // ✅ Order Details
+        orderAffiliateId: transactionData.orderAffiliateId || null,
         orderAmount: transactionData.orderAmount,
         orderCurrency: transactionData.orderCurrency,
-        orderDiscountCode: transactionData.orderDiscountCode,
+        orderDiscountCode: transactionData.orderDiscountCode || null,
         orderHasGiftMessage: transactionData.orderHasGiftMessage,
         orderIsGift: transactionData.orderIsGift,
-        orderReferrerUri: transactionData.orderReferrerUri,
-        orderSubaffiliateId: transactionData.orderSubaffiliateId,
+        orderReferrerUri: transactionData.orderReferrerUri || null,
+        orderSubaffiliateId: transactionData.orderSubaffiliateId || null,
+    
+        // ✅ Risk Scoring
         riskScore: response.riskScore,
         ipAddressRisk: response.ipAddress?.risk || 0,
+    
+        // ✅ Shopping Cart Items (if available)
         shoppingCartItems: {
-          create: transactionData.shoppingCartItems?.map((item:  ShoppingCartItemData)=> ({
+          create: transactionData.shoppingCartItems?.map((item: any) => ({
             category: item.category,
             itemId: item.itemId,
             price: item.price,
@@ -186,27 +126,76 @@ export async function POST(request: Request) {
         },
       },
     });
-
-    // Generate PDF report and update the record with the PDF data
+    
+    console.log(dbTransaction);
+    
+    // Generate PDF
     const pdfBytes = await generateMinFraudReport(dbTransaction, dbTransaction.id);
-    console.log(pdfBytes);
-    
-    
+
+    // Store PDF in the database
     await prisma.maxMindTransaction.update({
       where: { id: dbTransaction.id },
       data: { generatedPdf: pdfBytes },
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       transactionId: dbTransaction.id,
       riskScore: response.riskScore,
-      ipAddressRisk: response.ipAddress?.risk || 0
+      ipAddressRisk: response.ipAddress?.risk || 0,
     });
   } catch (error) {
     console.error('Error processing transaction:', error);
     return NextResponse.json(
-      { error: 'Failed to process transaction', details: error}, 
+      { error: 'Failed to process transaction', details: error },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+    const userId = searchParams.get("userId");
+    const minRiskScore = parseFloat(searchParams.get("minRiskScore") || "0");
+    const maxRiskScore = parseFloat(searchParams.get("maxRiskScore") || "100");
+
+    // Query conditions
+    const where: any = {};
+    if (startDate && endDate) {
+      where.eventTime = { gte: new Date(startDate), lte: new Date(endDate) };
+    }
+    if (userId) {
+      where.userId = userId;
+    }
+    if (!isNaN(minRiskScore) && !isNaN(maxRiskScore)) {
+      where.riskScore = { gte: minRiskScore, lte: maxRiskScore };
+    }
+
+    // Fetch transactions from database with filters
+    const transactions = await prisma.maxMindTransaction.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { eventTime: "desc" },
+    });
+
+    // Get total count for pagination
+    const totalCount = await prisma.maxMindTransaction.count({ where });
+
+    return NextResponse.json({
+      transactions,
+      pagination: { page, pageSize: limit, total: totalCount },
+    });
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch transactions" },
       { status: 500 }
     );
   }

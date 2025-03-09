@@ -1,12 +1,12 @@
 'use client';
 
-import  FingerprintJSPro, { type GetResult } from '@fingerprintjs/fingerprintjs-pro';
+import * as FingerprintJSPro from '@fingerprintjs/fingerprintjs-pro';
+import type { GetResult } from '@fingerprintjs/fingerprintjs-pro';
 
-let fpPromise: Promise< FingerprintJSPro> | null = null;
+let fpPromise: Promise<FingerprintJSPro.Agent> | null = null;
 
-export const initFingerprint = (): Promise< FingerprintJSPro> => {
+export const initFingerprint = (): Promise<FingerprintJSPro.Agent> => {
   if (!fpPromise) {
-    // Replace with your actual Fingerprint public API key
     fpPromise = FingerprintJSPro.load({ apiKey: 'your-fingerprint-public-api-key' });
   }
   return fpPromise;

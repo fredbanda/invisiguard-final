@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 function generateRecommendations(data: MaxMindResponse): string[] {
+  console.log(generateRecommendations);
+  
     const recommendations: string[] = [];
   
     if (data.risk_score !== undefined && data.risk_score > 75) {
@@ -32,5 +36,7 @@ function generateRecommendations(data: MaxMindResponse): string[] {
     }
   
     return recommendations;
+    
+    
   }
   

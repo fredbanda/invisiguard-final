@@ -128,7 +128,7 @@ model MaxMindTransaction {
 
   // Risk Scoring
   riskScore            Float
-  ipAddressRisk        Int
+  ipAddressRisk        Float
 
   // Shopping Cart Items
   shoppingCartItems    ShoppingCartItem[]

@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
+"use client";
 
-import { useVisitorData } from '@fingerprintjs/fingerprintjs-pro-react';
-import { useEffect } from 'react';
+import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react";
+import { useEffect } from "react";
 
 export default function FingerprintCollector() {
   const { data, error, getData } = useVisitorData(
-    { extendedResult: true }, 
+    { extendedResult: true },
     { immediate: true }
   );
 
   console.log("API Key: ", process.env.NEXT_PUBLIC_FINGERPRINTJS_API_KEY);
-  
+
   useEffect(() => {
     if (data) {
-      console.log('🔍 Collected Fingerprint Data:', data); // ✅ Debugging Log
+      console.log("🔍 Collected Fingerprint Data:", data); // ✅ Debugging Log
       saveFingerprint(data);
     }
   }, [data]);
@@ -22,39 +22,40 @@ export default function FingerprintCollector() {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const saveFingerprint = async (fingerprintData: any) => {
     try {
-      console.log('📤 Sending Fingerprint to API:', fingerprintData); // ✅ Debugging Log
+      console.log("📤 Sending Fingerprint to API:", fingerprintData); // ✅ Debugging Log
 
-      const response = await fetch('/api/fingerprint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/fingerprint", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           visitorId: fingerprintData.visitorId,
-          browser: fingerprintData.browserDetails?.browserName || 'Unknown',
-          os: fingerprintData.browserDetails?.os || 'Unknown',
-          device: fingerprintData.browserDetails?.device || 'Unknown',
+          browser: fingerprintData.browserDetails?.browserName || "Unknown",
+          os: fingerprintData.browserDetails?.os || "Unknown",
+          device: fingerprintData.browserDetails?.device || "Unknown",
           confidenceScore: fingerprintData.confidence?.score || 0,
           botProbability: fingerprintData.botProbability || 0,
           vpnDetected: fingerprintData.vpnDetected || false,
-          ipAddress: fingerprintData.ip || 'Unknown',
-          
+          ipAddress: fingerprintData.ip || "Unknown",
         }),
       });
 
       const result = await response.json();
-      console.log('✅ API Response:', result); // ✅ Debugging Log
+      console.log("✅ API Response:", result); // ✅ Debugging Log
     } catch (error) {
-      console.error('❌ Error saving fingerprint:', error);
+      console.error("❌ Error saving fingerprint:", error);
     }
   };
 
   return (
-    <div className='bg-white p-4 rounded-lg shadow-md'>
-      <button type="button" onClick={() => getData({ ignoreCache: true })}>Reload Data</button>
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <button type="button" onClick={() => getData({ ignoreCache: true })}>
+        Reload Data
+      </button>
       {error && <p>Error: {error.message}</p>}
       <p>Visitor ID: {data?.visitorId}</p>
       <p>Browser: {data?.browserName}</p>
       <p>OS: {data?.os}</p>
-       <p>OS Version: {data?.osVersion}</p>
+      <p>OS Version: {data?.osVersion}</p>
       <p>Device: {data?.device}</p>
       <p>Confidence: {data?.confidence.score}</p>
       <p>Bot Probability: {data?.bot?.probability}</p>
@@ -63,7 +64,6 @@ export default function FingerprintCollector() {
       <p>First Seen At: {data?.firstSeenAt.global}</p>
       <p>Last Seen At: {data?.lastSeenAt.global}</p>
       <p>Sealed Results{data?.sealedResult} </p>
-     
     </div>
   );
 }

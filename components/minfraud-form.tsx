@@ -1,25 +1,61 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { ChevronDown, CreditCard, Download, FileText, Globe, Home, Info, MapPin, User } from "lucide-react"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  ChevronDown,
+  CreditCard,
+  Download,
+  FileText,
+  Globe,
+  Home,
+  Info,
+  MapPin,
+  User,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { InsightsPanel } from "@/components/insights-panel"
-import { saveTransactionWithReport } from "@/actions/save-transactions"
-import { toast } from "sonner"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { InsightsPanel } from "@/components/insights-panel";
+import { saveTransactionWithReport } from "@/actions/save-transactions";
+import { toast } from "sonner";
+import Link from "next/link";
 
 const formSchema = z.object({
   // Transaction
@@ -65,22 +101,22 @@ const formSchema = z.object({
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
   sessionId: z.string().optional(),
-})
+});
 
 export default function MinFraudForm() {
   const [result, setResult] = useState<null | {
-    riskScore: number
-    fraudScore: number
-    ipRiskScore: number
-    recommendations: string[]
+    riskScore: number;
+    fraudScore: number;
+    ipRiskScore: number;
+    recommendations: string[];
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    warnings?: any[]
+    warnings?: any[];
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    insights?: any
-  }>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSavingReport, setIsSavingReport] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+    insights?: any;
+  }>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSavingReport, setIsSavingReport] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -129,32 +165,32 @@ export default function MinFraudForm() {
       userAgent: "",
       sessionId: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setIsSubmitting(true)
-      setError(null)
+      setIsSubmitting(true);
+      setError(null);
 
       // Auto-populate IP address if not provided
       if (!values.ipAddress) {
         try {
-          const ipResponse = await fetch("https://api.ipify.org?format=json")
-          const ipData = await ipResponse.json()
-          values.ipAddress = ipData.ip
+          const ipResponse = await fetch("https://api.ipify.org?format=json");
+          const ipData = await ipResponse.json();
+          values.ipAddress = ipData.ip;
         } catch (err) {
-          console.error("Could not auto-detect IP:", err)
+          console.error("Could not auto-detect IP:", err);
         }
       }
 
       // Auto-populate user agent if not provided
       if (!values.userAgent && typeof window !== "undefined") {
-        values.userAgent = window.navigator.userAgent
+        values.userAgent = window.navigator.userAgent;
       }
 
       // For testing with mock data
       //const response = await fetch("/api/minfraud-mock", {
-        // For production with real MaxMind API
+      // For production with real MaxMind API
       const response = await fetch("/api/maxmind", {
         method: "POST",
         headers: {
@@ -164,81 +200,86 @@ export default function MinFraudForm() {
           ...values,
           useInsights: true, // Set to false to use the score endpoint (uses fewer credits)
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        console.error("Error from API:", errorData)
-        setError(`Error: ${errorData.error || "Failed to get fraud analysis"}`)
-        return
+        const errorData = await response.json();
+        console.error("Error from API:", errorData);
+        setError(`Error: ${errorData.error || "Failed to get fraud analysis"}`);
+        return;
       }
 
-      const data = await response.json()
-      setResult(data)
+      const data = await response.json();
+      setResult(data);
     } catch (err) {
-      console.error("Error submitting form:", err)
-      setError("An unexpected error occurred. Please try again.")
+      console.error("Error submitting form:", err);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
   async function handleGenerateReport() {
-    if (!result) return
+    if (!result) return;
 
     try {
-      setIsSavingReport(true)
+      setIsSavingReport(true);
 
       // Save transaction and generate report
-      const saveResult = await saveTransactionWithReport(form.getValues(), result)
+      const saveResult = await saveTransactionWithReport(
+        form.getValues(),
+        result
+      );
 
       if (saveResult.success) {
-        toast.success("The report has been saved to the database.",{
+        toast.success("The report has been saved to the database.", {
           position: "top-right",
-        })
+        });
       } else {
-        console.error("Error details:", saveResult.error)
-        toast("Failed to generate report",{
+        console.error("Error details:", saveResult.error);
+        toast("Failed to generate report", {
           position: "top-right",
-        })
+        });
       }
     } catch (err) {
-      console.error("Error generating report:", err)
-      toast("An unexpected error occurred while generating the report.",{
+      console.error("Error generating report:", err);
+      toast("An unexpected error occurred while generating the report.", {
         position: "top-right",
-      })
+      });
     } finally {
-      setIsSavingReport(false)
+      setIsSavingReport(false);
     }
   }
 
   async function handleDownloadPdf() {
-    if (!result) return
+    if (!result) return;
 
     try {
       // Generate PDF client-side for download
-      const { generateMinFraudReport } = await import("@/lib/pdf-generator")
-      const pdfBytes = await generateMinFraudReport(result, form.getValues())
+      const { generateMinFraudReport } = await import("@/lib/pdf-generator");
+      const pdfBytes = await generateMinFraudReport(result, form.getValues());
 
       // Create a blob from the PDF bytes
-      const blob = new Blob([pdfBytes], { type: "application/pdf" })
-      const url = URL.createObjectURL(blob)
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
 
       // Create a link and trigger download
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `minfraud-report-${form.getValues().transactionId || "unknown"}.pdf`
-      document.body.appendChild(link)
-      link.click()
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `minfraud-report-${
+        form.getValues().transactionId || "unknown"
+      }.pdf`;
+      document.body.appendChild(link);
+      link.click();
 
       // Clean up
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Error downloading PDF:", err)
-      toast("Failed to download the PDF report.",{
+      console.error("Error downloading PDF:", err);
+      toast("Failed to download the PDF report.", {
         position: "top-right",
-      })
+      });
     }
   }
 
@@ -260,16 +301,22 @@ export default function MinFraudForm() {
     <div className="container mx-auto py-6 w-[800px]">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold text-white/80 text-center">Invisiguard Fraud Interactive Widget</h1>
+          <h1 className="text-3xl font-bold text-white/80 text-center">
+            Invisiguard Fraud Interactive Widget
+          </h1>
           <p className="text-white text-center">
-            Submit transaction data to evaluate fraud risk using Invisiguard&apos;s Fraud service
+            Submit transaction data to evaluate fraud risk using
+            Invisiguard&apos;s Fraud service
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 <Accordion type="multiple" defaultValue={["transaction"]}>
                   <AccordionItem value="transaction">
                     <AccordionTrigger className="bg-muted/50 px-4 rounded-t-md">
@@ -300,7 +347,10 @@ export default function MinFraudForm() {
                             <FormItem>
                               <FormLabel>Transaction ID *</FormLabel>
                               <FormControl>
-                                <Input placeholder="Transaction ID" {...field} />
+                                <Input
+                                  placeholder="Transaction ID"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -325,7 +375,10 @@ export default function MinFraudForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Currency *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select currency" />
@@ -350,7 +403,10 @@ export default function MinFraudForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Transaction Type *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select type" />
@@ -359,7 +415,9 @@ export default function MinFraudForm() {
                                 <SelectContent>
                                   <SelectItem value="sale">Sale</SelectItem>
                                   <SelectItem value="credit">Credit</SelectItem>
-                                  <SelectItem value="authorization">Authorization</SelectItem>
+                                  <SelectItem value="authorization">
+                                    Authorization
+                                  </SelectItem>
                                   <SelectItem value="update">Update</SelectItem>
                                 </SelectContent>
                               </Select>
@@ -387,9 +445,15 @@ export default function MinFraudForm() {
                             <FormItem>
                               <FormLabel>Card BIN (first 6 digits)</FormLabel>
                               <FormControl>
-                                <Input placeholder="123456" maxLength={6} {...field} />
+                                <Input
+                                  placeholder="123456"
+                                  maxLength={6}
+                                  {...field}
+                                />
                               </FormControl>
-                              <FormDescription>First 6 digits of the credit card number</FormDescription>
+                              <FormDescription>
+                                First 6 digits of the credit card number
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -401,7 +465,11 @@ export default function MinFraudForm() {
                             <FormItem>
                               <FormLabel>Last 4 digits</FormLabel>
                               <FormControl>
-                                <Input placeholder="1234" maxLength={4} {...field} />
+                                <Input
+                                  placeholder="1234"
+                                  maxLength={4}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -413,18 +481,31 @@ export default function MinFraudForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>AVS Result</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select AVS result" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="Y">Y - Address & 5-digit ZIP match</SelectItem>
-                                  <SelectItem value="A">A - Address matches, ZIP does not</SelectItem>
-                                  <SelectItem value="Z">Z - 5-digit ZIP matches, address does not</SelectItem>
-                                  <SelectItem value="N">N - Neither address nor ZIP match</SelectItem>
-                                  <SelectItem value="U">U - Address unavailable</SelectItem>
+                                  <SelectItem value="Y">
+                                    Y - Address & 5-digit ZIP match
+                                  </SelectItem>
+                                  <SelectItem value="A">
+                                    A - Address matches, ZIP does not
+                                  </SelectItem>
+                                  <SelectItem value="Z">
+                                    Z - 5-digit ZIP matches, address does not
+                                  </SelectItem>
+                                  <SelectItem value="N">
+                                    N - Neither address nor ZIP match
+                                  </SelectItem>
+                                  <SelectItem value="U">
+                                    U - Address unavailable
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -437,18 +518,31 @@ export default function MinFraudForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>CVV Result</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select CVV result" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="M">M - CVV matches</SelectItem>
-                                  <SelectItem value="N">N - CVV does not match</SelectItem>
-                                  <SelectItem value="P">P - Not processed</SelectItem>
-                                  <SelectItem value="S">S - Merchant indicated CVV should be on card</SelectItem>
-                                  <SelectItem value="U">U - Issuer not certified</SelectItem>
+                                  <SelectItem value="M">
+                                    M - CVV matches
+                                  </SelectItem>
+                                  <SelectItem value="N">
+                                    N - CVV does not match
+                                  </SelectItem>
+                                  <SelectItem value="P">
+                                    P - Not processed
+                                  </SelectItem>
+                                  <SelectItem value="S">
+                                    S - Merchant indicated CVV should be on card
+                                  </SelectItem>
+                                  <SelectItem value="U">
+                                    U - Issuer not certified
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -475,7 +569,11 @@ export default function MinFraudForm() {
                             <FormItem>
                               <FormLabel>Email Address</FormLabel>
                               <FormControl>
-                                <Input type="email" placeholder="user@example.com" {...field} />
+                                <Input
+                                  type="email"
+                                  placeholder="user@example.com"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -592,7 +690,10 @@ export default function MinFraudForm() {
                             <FormItem>
                               <FormLabel>State/Province/Region</FormLabel>
                               <FormControl>
-                                <Input placeholder="State/Province" {...field} />
+                                <Input
+                                  placeholder="State/Province"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -617,16 +718,23 @@ export default function MinFraudForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Country</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select country" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="US">United States</SelectItem>
+                                  <SelectItem value="US">
+                                    United States
+                                  </SelectItem>
                                   <SelectItem value="CA">Canada</SelectItem>
-                                  <SelectItem value="GB">United Kingdom</SelectItem>
+                                  <SelectItem value="GB">
+                                    United Kingdom
+                                  </SelectItem>
                                   <SelectItem value="AU">Australia</SelectItem>
                                   <SelectItem value="DE">Germany</SelectItem>
                                   <SelectItem value="FR">France</SelectItem>
@@ -643,7 +751,10 @@ export default function MinFraudForm() {
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
-                                <Input placeholder="+1 555-123-4567" {...field} />
+                                <Input
+                                  placeholder="+1 555-123-4567"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -734,7 +845,10 @@ export default function MinFraudForm() {
                             <FormItem>
                               <FormLabel>State/Province/Region</FormLabel>
                               <FormControl>
-                                <Input placeholder="State/Province" {...field} />
+                                <Input
+                                  placeholder="State/Province"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -759,16 +873,23 @@ export default function MinFraudForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Country</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select country" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="US">United States</SelectItem>
+                                  <SelectItem value="US">
+                                    United States
+                                  </SelectItem>
                                   <SelectItem value="CA">Canada</SelectItem>
-                                  <SelectItem value="GB">United Kingdom</SelectItem>
+                                  <SelectItem value="GB">
+                                    United Kingdom
+                                  </SelectItem>
                                   <SelectItem value="AU">Australia</SelectItem>
                                   <SelectItem value="DE">Germany</SelectItem>
                                   <SelectItem value="FR">France</SelectItem>
@@ -846,7 +967,12 @@ export default function MinFraudForm() {
                 </Accordion>
 
                 <div className="flex justify-end gap-2">
-                  <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    disabled={isSubmitting}
+                    className="w-full"
+                  >
                     {isSubmitting ? "Analyzing..." : "Submit for Analysis"}
                   </Button>
                 </div>
@@ -864,7 +990,9 @@ export default function MinFraudForm() {
             <Card>
               <CardHeader>
                 <CardTitle>Analysis Results</CardTitle>
-                <CardDescription>Fraud risk assessment based on submitted data</CardDescription>
+                <CardDescription>
+                  Fraud risk assessment based on submitted data
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {result ? (
@@ -872,17 +1000,24 @@ export default function MinFraudForm() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Risk Score</span>
-                        <span className="text-sm font-bold">{result.riskScore}</span>
+                        <span className="text-sm font-bold">
+                          {result.riskScore}
+                        </span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2.5">
-                        <div className="bg-primary h-2.5 rounded-full" style={{ width: `${result.riskScore}%` }} />
+                        <div
+                          className="bg-primary h-2.5 rounded-full"
+                          style={{ width: `${result.riskScore}%` }}
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Fraud Score</span>
-                        <span className="text-sm font-bold">{result.fraudScore}</span>
+                        <span className="text-sm font-bold">
+                          {result.fraudScore}
+                        </span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2.5">
                         <div
@@ -890,8 +1025,8 @@ export default function MinFraudForm() {
                             result.fraudScore > 75
                               ? "bg-destructive"
                               : result.fraudScore > 50
-                                ? "bg-warning"
-                                : "bg-success"
+                              ? "bg-warning"
+                              : "bg-success"
                           }`}
                           style={{ width: `${result.fraudScore}%` }}
                         />
@@ -900,8 +1035,12 @@ export default function MinFraudForm() {
 
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">IP Risk Score</span>
-                        <span className="text-sm font-bold">{result.ipRiskScore}</span>
+                        <span className="text-sm font-medium">
+                          IP Risk Score
+                        </span>
+                        <span className="text-sm font-bold">
+                          {result.ipRiskScore}
+                        </span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2.5">
                         <div
@@ -916,31 +1055,51 @@ export default function MinFraudForm() {
                     <div>
                       <h3 className="font-medium mb-2">Recommendations</h3>
                       <ul className="space-y-1">
-                        {result.recommendations.map((rec, i) => (
-                          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<li key={i} className="text-sm flex items-start gap-2">
-                            <span className="bg-primary/10 text-primary rounded-full p-1 mt-0.5">
-                              <ChevronDown className="h-3 w-3" />
-                            </span>
-                            {rec}
+                        {result?.recommendations?.length ? (
+                          result.recommendations.map((rec, i) => (
+                            <li
+                              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                              key={i}
+                              className="text-sm flex items-start gap-2"
+                            >
+                              <span className="bg-primary/10 text-primary rounded-full p-1 mt-0.5">
+                                <ChevronDown className="h-3 w-3" />
+                              </span>
+                              {rec}
+                            </li>
+                          ))
+                        ) : (
+                          <li className="text-sm text-gray-500">
+                            No recommendations available.
                           </li>
-                        ))}
+                        )}
                       </ul>
                     </div>
 
-                    {result?.insights && Object.keys(result.insights).length > 0 && (
-                      <InsightsPanel insights={result.insights} />
-                    )}
+                    {result?.insights &&
+                      Object.keys(result.insights).length > 0 && (
+                        <InsightsPanel insights={result.insights} />
+                      )}
 
                     <Separator />
 
                     <div className="flex flex-col gap-2">
-                      <Button onClick={handleGenerateReport} disabled={isSavingReport} className="w-full">
+                      <Button
+                        onClick={handleGenerateReport}
+                        disabled={isSavingReport}
+                        className="w-full"
+                      >
                         <FileText className="mr-2 h-4 w-4" />
-                        {isSavingReport ? "Saving..." : "Save Report to Database"}
+                        {isSavingReport
+                          ? "Saving..."
+                          : "Save Report to Database"}
                       </Button>
 
-                      <Button onClick={handleDownloadPdf} variant="outline" className="w-full">
+                      <Button
+                        onClick={handleDownloadPdf}
+                        variant="outline"
+                        className="w-full"
+                      >
                         <Download className="mr-2 h-4 w-4" />
                         Download PDF Report
                       </Button>
@@ -949,7 +1108,9 @@ export default function MinFraudForm() {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
                     <Info className="h-12 w-12 mb-4 opacity-20" />
-                    <p>Submit transaction data to see fraud risk analysis results</p>
+                    <p>
+                      Submit transaction data to see fraud risk analysis results
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -958,7 +1119,8 @@ export default function MinFraudForm() {
                   <Info className="h-4 w-4" />
                   <AlertTitle>Information</AlertTitle>
                   <AlertDescription>
-                    This form connects to MaxMind&apos;s minFraud API for real-time fraud detection.
+                    This form connects to MaxMind&apos;s minFraud API for
+                    real-time fraud detection.
                   </AlertDescription>
                 </Alert>
               </CardFooter>
@@ -975,6 +1137,5 @@ export default function MinFraudForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
