@@ -3,8 +3,6 @@ import { SelectItem } from "@/components/ui/select";
 export const CountrySelector = () => {
   return (
     <>
-
-
       <SelectItem value="AF">Afghanistan</SelectItem>
       <SelectItem value="AX">Åland Islands</SelectItem>
       <SelectItem value="AL">Albania</SelectItem>
