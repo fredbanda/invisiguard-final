@@ -614,7 +614,7 @@ const MaxMindForm = () => {
             </div>
           </form>
         </div>
-                  <ResultsSection />
+        <ResultsSection />
         </div>
     </div>
   );

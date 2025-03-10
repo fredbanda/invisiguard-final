@@ -56,6 +56,7 @@ import { InsightsPanel } from "@/components/insights-panel";
 import { saveTransactionWithReport } from "@/actions/save-transactions";
 import { toast } from "sonner";
 import Link from "next/link";
+import { CountrySelector } from "./country-selector";
 
 const formSchema = z.object({
   // Transaction
@@ -728,16 +729,7 @@ export default function MinFraudForm() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="US">
-                                    United States
-                                  </SelectItem>
-                                  <SelectItem value="CA">Canada</SelectItem>
-                                  <SelectItem value="GB">
-                                    United Kingdom
-                                  </SelectItem>
-                                  <SelectItem value="AU">Australia</SelectItem>
-                                  <SelectItem value="DE">Germany</SelectItem>
-                                  <SelectItem value="FR">France</SelectItem>
+                                  <CountrySelector />
                                 </SelectContent>
                               </Select>
                               <FormMessage />
