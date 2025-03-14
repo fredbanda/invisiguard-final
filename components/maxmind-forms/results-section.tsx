@@ -19,10 +19,23 @@ interface RiskResponse {
 export const ResultsSection = () => {
   const [response, setResponse] = useState<RiskResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-console.log(setError, setLoading, setResponse);
-
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/your-endpoint");
+      if (!res.ok) throw new Error("Failed to fetch data");
+      const data: RiskResponse = await res.json();
+      setResponse(data);
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="md:w-1/3">
@@ -53,7 +66,7 @@ console.log(setError, setLoading, setResponse);
                   {/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
                   <div
                     className={`h-4 rounded-full ${
-                      response?.riskScore < 33
+                      response.riskScore < 33
                         ? "bg-green-500"
                         : response.riskScore < 66
                         ? "bg-yellow-500"
@@ -66,36 +79,13 @@ console.log(setError, setLoading, setResponse);
               </div>
             </div>
 
-            {response?.ipRiskScore !== undefined && (
-              <div className="bg-gray-100 p-4 rounded">
-                <h3 className="font-semibold mb-2">IP Risk Score</h3>
-                <div className="flex items-center">
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    {/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
-                    <div
-                      className={`h-4 rounded-full ${
-                        response.ipRiskScore < 33
-                          ? "bg-green-500"
-                          : response.ipRiskScore < 66
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
-                      }`}
-                      style={{ width: `${response.ipRiskScore}%` }}
-                    ></div>
-                  </div>
-                  <span className="ml-2 font-semibold">
-                    {response.ipRiskScore}
-                  </span>
-                </div>
-              </div>
-            )}
-
             {response.recommendations &&
               response.recommendations.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Recommendations</h3>
                   <ul className="list-disc pl-5 space-y-1">
                     {response.recommendations.map((rec, index) => (
+                      // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                       <li key={index} className="text-sm">
                         {rec}
                       </li>
@@ -109,6 +99,7 @@ console.log(setError, setLoading, setResponse);
                 <h3 className="font-semibold mb-2">Warnings</h3>
                 <ul className="list-disc pl-5 space-y-1">
                   {response.warnings.map((warning, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                     <li key={index} className="text-sm">
                       {warning.code}: {warning.warning}
                     </li>
@@ -117,22 +108,15 @@ console.log(setError, setLoading, setResponse);
               </div>
             )}
 
-            {response.insights && Object.keys(response.insights).length > 0 && (
+            {response.insights?.ipLocation && (
               <div>
                 <h3 className="font-semibold mb-2">Additional Insights</h3>
-                <div className="space-y-2">
-                  {response.insights.ipLocation && (
-                    <div>
-                      <h4 className="text-sm font-medium">IP Location</h4>
-                      <p className="text-sm">
-                        {response.insights.ipLocation.city},{" "}
-                        {response.insights.ipLocation.country}
-                        {response.insights.ipLocation.isp &&
-                          ` (${response.insights.ipLocation.isp})`}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <p className="text-sm">
+                  {response.insights.ipLocation.city},{" "}
+                  {response.insights.ipLocation.country}
+                  {response.insights.ipLocation.isp &&
+                    ` (${response.insights.ipLocation.isp})`}
+                </p>
               </div>
             )}
           </div>

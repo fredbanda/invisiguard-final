@@ -200,7 +200,7 @@ export default function MinMaxDashboardComponent() {
                 Average Risk Score
               </h3>
               <p className="text-3xl font-bold">
-                {dashboardData.summary.avgRiskScore.toFixed(1)}
+                {(dashboardData.summary.avgRiskScore || 0).toFixed(1)}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
@@ -404,7 +404,7 @@ export default function MinMaxDashboardComponent() {
                             transaction.riskScore
                           )}`}
                         >
-                          {transaction.riskScore.toFixed(1)}
+                          {(transaction.riskScore || 0).toFixed(1)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

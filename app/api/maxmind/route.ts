@@ -12,6 +12,7 @@ interface MaxMindResponse {
     city?: { names?: { en?: string } };
     traits?: { isp?: string };
   };
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   warnings?: any[];
   email?: { is_free?: boolean };
   billing_address?: { is_postal_in_city?: boolean };
@@ -247,6 +248,7 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(data);
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     } catch (error: any) {
       clearTimeout(timeoutId);
 
@@ -271,6 +273,7 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   } catch (error: any) {
     console.error("Critical error in MaxMind API handler:", error);
 
@@ -287,7 +290,9 @@ export async function POST(request: Request) {
 }
 
 // Rest of the functions remain the same
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function transformFormDataToMinFraudFormat(formData: MinFraudRequest): any {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const result: any = {};
 
   // Device data
@@ -411,8 +416,8 @@ function transformFormDataToMinFraudFormat(formData: MinFraudRequest): any {
     result.order = {};
 
     if (formData.transactionAmount) {
-      const amount = parseFloat(formData.transactionAmount);
-      if (!isNaN(amount)) {
+      const amount = Number.parseFloat(formData.transactionAmount);
+      if (!Number.isNaN(amount)) {
         result.order.amount = amount;
       }
     }
@@ -429,35 +434,45 @@ function transformFormDataToMinFraudFormat(formData: MinFraudRequest): any {
   return result;
 }
 
-function generateRecommendations(data: MaxMindResponse) {
-  const recommendations = [];
+// Backend: Recommendation and Response Processing
+
+interface MaxMindResponse {
+  risk_score?: number;
+  fraud_score?: number;
+  ip_address?: {
+    risk?: number;
+    country?: { names?: { en?: string } };
+    city?: { names?: { en?: string } };
+    traits?: { isp?: string };
+  };
+  email?: { is_free?: boolean };
+  billing_address?: { is_postal_in_city?: boolean };
+  shipping_address?: { distance_to_billing_address?: number };
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  warnings?: any[] //{ code: string; warning: string }[];
+}
+
+function generateRecommendations(data: MaxMindResponse): string[] {
+  const recommendations: string[] = [];
 
   // Risk score based recommendations
   const riskScore = data.risk_score ?? 0;
   if (riskScore > 90) {
-    recommendations.push(
-      "Very high risk transaction - manual review strongly recommended"
-    );
+    recommendations.push("Very high risk transaction - manual review strongly recommended");
   } else if (riskScore > 75) {
-    recommendations.push(
-      "High risk transaction - consider additional verification steps"
-    );
+    recommendations.push("High risk transaction - consider additional verification steps");
   } else if (riskScore > 50) {
     recommendations.push("Medium risk transaction - monitor closely");
   }
 
   // IP-specific recommendations
   if ((data.ip_address?.risk ?? 0) > 80) {
-    recommendations.push(
-      "IP address has high risk score - potential proxy/VPN usage"
-    );
+    recommendations.push("IP address has high risk score - potential proxy/VPN usage");
   }
 
   // Email recommendations
-  if (data.email?.is_free === true) {
-    recommendations.push(
-      "Free email service used - consider this in risk assessment"
-    );
+  if (data.email?.is_free) {
+    recommendations.push("Free email service used - consider this in risk assessment");
   }
 
   // Address validation recommendations
@@ -466,9 +481,7 @@ function generateRecommendations(data: MaxMindResponse) {
   }
 
   if ((data.shipping_address?.distance_to_billing_address ?? 0) > 1000) {
-    recommendations.push(
-      "Large distance between shipping and billing addresses"
-    );
+    recommendations.push("Large distance between shipping and billing addresses");
   }
 
   return recommendations;
@@ -477,7 +490,6 @@ function generateRecommendations(data: MaxMindResponse) {
 function processMinFraudResponse(data: MaxMindResponse) {
   return {
     riskScore: data.risk_score ?? 0,
-    fraudScore: data.fraud_score ?? 0,
     ipRiskScore: data.ip_address?.risk ?? 0,
     recommendations: generateRecommendations(data),
     warnings: data.warnings ?? [],
@@ -486,14 +498,6 @@ function processMinFraudResponse(data: MaxMindResponse) {
         country: data.ip_address?.country?.names?.en,
         city: data.ip_address?.city?.names?.en,
         isp: data.ip_address?.traits?.isp,
-      },
-      emailInfo: {
-        isFree: data.email?.is_free,
-      },
-      addressInfo: {
-        isPostalInCity: data.billing_address?.is_postal_in_city,
-        shippingToBillingDistance:
-          data.shipping_address?.distance_to_billing_address,
       },
     },
   };

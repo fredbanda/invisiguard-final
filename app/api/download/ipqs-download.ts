@@ -63,7 +63,7 @@ export async function GET(req: Request) {
     addText(`Email: ${report.email}`, fontSize, 50, 10);
     addText(`IP Address: ${report.ipAddress}`, fontSize, 50, 10);
     if (report.riskScore) {
-      addText(`Risk Score: ${report.riskScore.toFixed(2)}`, fontSize, 50, 10);
+      addText(`Risk Score: ${(report.riskScore || 0).toFixed(2)}`, fontSize, 50, 10);
     }
     
     if (report.billingCity || report.billingCountry) {

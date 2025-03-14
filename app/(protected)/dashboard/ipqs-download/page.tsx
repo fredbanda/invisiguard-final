@@ -87,17 +87,19 @@ export default function ReportsPage() {
                 <td className="py-2 px-4 border-b">{report.ipAddress}</td>
                 <td className="py-2 px-4 border-b">
                   {report.riskScore !== null
-                    ? `${report.riskScore.toFixed(2)}/100`
+                    ? `${(report.riskScore || 0).error(2)}/100`
                     : "N/A"}
                 </td>
                 <td className="py-2 px-4 border-b space-x-2">
                   <button
+                    type="button"
                     onClick={() => viewReportDetails(report.id)}
                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                   >
                     View
                   </button>
                   <button
+                    type="button"
                     onClick={() => downloadPdf(report.id)}
                     className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                   >
