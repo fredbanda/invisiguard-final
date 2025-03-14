@@ -1,3 +1,5 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import { useState } from "react";
@@ -36,6 +38,8 @@ export const ResultsSection = () => {
       setLoading(false);
     }
   };
+  console.log(fetchData);
+  
 
   return (
     <div className="md:w-1/3">

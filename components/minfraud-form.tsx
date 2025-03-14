@@ -221,37 +221,44 @@ export default function MinFraudForm() {
   }
 
   async function handleGenerateReport() {
-    if (!result) return;
-
+    if (!result) {
+      console.warn("handleGenerateReport aborted: 'result' is undefined or null.");
+      return;
+    }
+  
     try {
+      console.log("Starting report generation...");
       setIsSavingReport(true);
-
+  
+      // Log form values and result before calling save function
+      console.log("Form values:", form.getValues());
+      console.log("Result data:", result);
+  
       // Save transaction and generate report
-      const saveResult = await saveTransactionWithReport(
-        form.getValues(),
-        result
-      );
-
+      const saveResult = await saveTransactionWithReport(form.getValues(), result);
+  
+      console.log("saveTransactionWithReport response:", saveResult);
+  
       if (saveResult.success) {
         toast.success("The report has been saved to the database.", {
           position: "top-right",
         });
+        console.log("Report successfully saved.");
       } else {
-        console.error("Error details:", saveResult.error);
-        toast("Failed to generate report", {
-          position: "top-right",
-        });
+        console.error("Failed to save report. Error details:", saveResult.error);
+        toast.error("Failed to generate report", { position: "top-right" });
       }
     } catch (err) {
-      console.error("Error generating report:", err);
-      toast("An unexpected error occurred while generating the report.", {
+      console.error("Unexpected error while generating report:", err);
+      toast.error("An unexpected error occurred while generating the report.", {
         position: "top-right",
       });
     } finally {
       setIsSavingReport(false);
+      console.log("Report generation process completed.");
     }
   }
-
+  
   async function handleDownloadPdf() {
     if (!result) return;
 

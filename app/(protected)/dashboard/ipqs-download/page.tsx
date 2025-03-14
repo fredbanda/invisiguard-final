@@ -87,7 +87,7 @@ export default function ReportsPage() {
                 <td className="py-2 px-4 border-b">{report.ipAddress}</td>
                 <td className="py-2 px-4 border-b">
                   {report.riskScore !== null
-                    ? `${(report.riskScore || 0).error(2)}/100`
+                    ? `${(report.riskScore || 0).toFixed(2)}/100`
                     : "N/A"}
                 </td>
                 <td className="py-2 px-4 border-b space-x-2">

@@ -125,46 +125,19 @@ export const {
       return session;
     },
     async jwt({ token, user, account }) {
-      // Only set token.sub on first login
       if (user) {
         token.sub = user.id;
       }
     
-      // If visitorId is present in account, add it to token
       if (account?.visitorId) {
         token.visitorId = account.visitorId;
       }
     
-      // If no user id, return token early
-      if (!token.sub) return token;
+      if (!token.sub) return { ...token }; // Ensure it's never null
     
-      // Fetch existing user details
       const existingUser = await getUserById(token.sub);
-      if (!existingUser) return token;
+      if (!existingUser) return { ...token };
     
-      // Fetch fingerprint data if visitorId is present
-
-       if (token.visitorId) {
-         const fingerprintData = await getFingerprintData(token.visitorId as string);
-         if (fingerprintData) {
-           token.fingerprint = {
-            visitorId: fingerprintData.visitorId,
-            ip: fingerprintData.ips,
-             country: fingerprintData.country,
-             city: fingerprintData.city,
-            isp: fingerprintData.isp,
-            vpnOrProxy: fingerprintData.vpnOrProxy,
-             botProbability: fingerprintData.botProbability,
-             confidenceScore: fingerprintData.confidenceScore,
-            fraudScore: fingerprintData.fraudScore,
-            browser: fingerprintData.browser,
-            os: fingerprintData.os,
-            device: fingerprintData.device,
-            lastUpdated: fingerprintData.lastUpdated,
-          };
-         }
-      }
-
       if (token.visitorId) {
         const fingerprintData = await getFingerprintData(token.visitorId as string);
         if (fingerprintData) {
@@ -186,11 +159,9 @@ export const {
         }
       }
     
-      // Fetch account information to determine if it's an OAuth user
       const existingAccount = await getAccountByUserId(existingUser.id);
       token.isOAuth = !!existingAccount;
     
-      // Add user details to token
       token.role = existingUser.role;
       token.name = existingUser.name;
       token.email = existingUser.email;
@@ -204,8 +175,10 @@ export const {
       token.postcode = existingUser.postcode;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
     
+      console.log("JWT Callback Output:", token); // Debugging log
       return token;
     },
+    
     
   },
   adapter: PrismaAdapter(db),
